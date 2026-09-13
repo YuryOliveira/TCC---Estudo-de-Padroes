@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Padrões de Cores</title>
+<style>
+  :root {
+    --bg: #F7F5F2;
+    --ink: #1F2430;
+    --muted: #7A7F8C;
+    --card: #FFFFFF;
+    --border: #E3E0D8;
+    --accent: #2D6A4F;
+    --accent-soft: #D8EFE3;
+    --wrong: #C7402A;
+    --wrong-soft: #FBE2DC;
+
+    --red: #E5342A;
+    --blue: #1E8FE0;
+    --green: #2FA84F;
+    --yellow: #F0B429;
+    --black: #1A1A1A;
+    --purple: #8B5CF6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Georgia', 'Iowan Old Style', serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    margin: 0;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .progress {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .progress .tier {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+
+  .restart-header-btn {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.78rem;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .restart-header-btn:hover {
+    color: var(--ink);
+    border-color: var(--muted);
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 40px 32px;
+  }
+
+  .pattern-label, .options-label, .answer-label {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0 0 16px 0;
+  }
+
+  .pattern-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 44px;
+    min-height: 64px;
+  }
+
+  .options-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dot {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2.5px solid var(--ink);
+    flex-shrink: 0;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+
+  .dot.blank {
+    position: relative;
+  }
+
+  .dot.blank:not(.filled) {
+    background: #fff;
+  }
+
+  .dot.blank::after {
+    content: "?";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1.3rem;
+    color: var(--muted);
+  }
+
+  .dot.blank.filled::after { content: ""; }
+
+  .dot.blank.active {
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    border-color: var(--accent);
+  }
+
+  .dot.blank.correct {
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  .dot.blank.incorrect {
+    box-shadow: 0 0 0 4px var(--wrong-soft);
+  }
+
+  .dot.mini {
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+  }
+
+  .answer-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 6px;
+  }
+
+  .option {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2.5px solid var(--ink);
+    cursor: pointer;
+    transition: transform 0.12s ease;
+    padding: 0;
+  }
+
+  .option:hover { transform: translateY(-3px); }
+  .option:active { transform: translateY(0); }
+  .option:disabled { cursor: default; opacity: 0.4; }
+
+  .c-red { background: var(--red); }
+  .c-blue { background: var(--blue); }
+  .c-green { background: var(--green); }
+  .c-yellow { background: var(--yellow); }
+  .c-black { background: var(--black); }
+  .c-purple { background: var(--purple); }
+  .c-black { border-color: #565b66; }
+
+  .feedback {
+    margin-top: 28px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    min-height: 24px;
+  }
+
+  .feedback.correct { color: var(--accent); }
+  .feedback.incorrect { color: var(--wrong); }
+
+  .answer-reveal {
+    margin-top: 18px;
+    text-align: center;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .next-btn, .clear-btn {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 22px;
+    cursor: pointer;
+  }
+
+  .next-btn {
+    background: var(--ink);
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  .next-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .clear-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .clear-btn.hidden { display: none; }
+
+  .final {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .final-emoji {
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .final h2 {
+    font-weight: 400;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+  }
+
+  .final-score {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .final p {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .restart-btn, .play-btn {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 12px 28px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .restart-btn.secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    margin-left: 10px;
+  }
+
+  .final-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dots-bar {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .step-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  .step-dot.done { background: var(--accent); }
+  .step-dot.current { background: var(--ink); }
+
+  /* Tela inicial */
+  .start-screen {
+    text-align: center;
+    padding: 56px 24px;
+  }
+
+  .start-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .start-dots .dot {
+    width: 30px;
+    height: 30px;
+  }
+
+  .start-screen h2 {
+    font-weight: 400;
+    font-size: 1.7rem;
+    margin: 0 0 12px 0;
+  }
+
+  .start-screen p {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--muted);
+    font-size: 0.92rem;
+    max-width: 420px;
+    margin: 0 auto 30px auto;
+    line-height: 1.5;
+  }
+
+  .play-btn {
+    font-size: 1rem;
+    padding: 14px 40px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Padrões de Cores</h1>
+    <div class="header-right" id="header-right"></div>
+  </header>
+
+  <div class="card" id="game-area"></div>
+
+  <div class="dots-bar" id="dots-bar"></div>
+</div>
+
+<script>
+const COLORS = {
+  red:    { class: 'c-red' },
+  blue:   { class: 'c-blue' },
+  green:  { class: 'c-green' },
+  yellow: { class: 'c-yellow' },
+  black:  { class: 'c-black' },
+  purple: { class: 'c-purple' }
+};
+
+const BASE_COLOR_KEYS = ['red', 'blue', 'green', 'yellow'];
+const FULL_COLOR_KEYS = ['red', 'blue', 'green', 'yellow', 'black', 'purple'];
+
+const TOTAL_ROUNDS = 30;
+
+let currentRound = 0;
+let score = 0;
+let rounds = [];
+
+let currentAnswers = [];
+let filledAnswers = [];
+let activeBlankIndex = 0;
+let roundFinished = false;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickColors(n, pool) {
+  return shuffle(pool).slice(0, n);
+}
+
+// Gera um padrão cíclico. Se randomPosition=false, os espaços ficam sempre
+// no final da sequência. Se true, o bloco de espaços pode aparecer em
+// qualquer posição (início, meio ou fim), tornando o padrão mais difícil
+// de deduzir só olhando o começo.
+function generatePattern(numColors, numBlanks, pool, randomPosition, repeats, optionCount) {
+  const palette = pickColors(numColors, pool);
+  const cycle = shuffle(palette);
+
+  const totalLen = cycle.length * repeats;
+
+  const sequence = [];
+  for (let i = 0; i < totalLen; i++) {
+    sequence.push(cycle[i % cycle.length]);
+  }
+
+  let blankStart;
+  if (randomPosition) {
+    blankStart = Math.floor(Math.random() * (totalLen - numBlanks + 1));
+  } else {
+    blankStart = totalLen - numBlanks;
+  }
+
+  const visibleBefore = sequence.slice(0, blankStart);
+  const answers = sequence.slice(blankStart, blankStart + numBlanks);
+  const visibleAfter = sequence.slice(blankStart + numBlanks);
+
+  // As opções sempre incluem as cores realmente usadas no padrão (senão
+  // ficaria impossível responder), completando com cores extras do pool
+  // até atingir optionCount, pra servir de distração.
+  let optionColors = [...palette];
+  const extras = shuffle(pool.filter(c => !palette.includes(c)));
+  while (optionColors.length < optionCount && extras.length) {
+    optionColors.push(extras.pop());
+  }
+  optionColors = shuffle(optionColors);
+
+  return { visibleBefore, visibleAfter, answers, numBlanks, optionColors };
+}
+
+function buildRounds() {
+  rounds = [];
+  // Níveis 1–5: 1 espaço, 2 cores, sempre no final, 4 opções
+  for (let i = 0; i < 5; i++) rounds.push(generatePattern(2, 1, BASE_COLOR_KEYS, false, 6, 4));
+  // Níveis 6–10: 1 espaço, 3 cores, sempre no final, 4 opções
+  for (let i = 0; i < 5; i++) rounds.push(generatePattern(3, 1, BASE_COLOR_KEYS, false, 3, 4));
+  // Níveis 11–15: 2 espaços, 3 cores, sempre no final, 4 opções
+  for (let i = 0; i < 5; i++) rounds.push(generatePattern(3, 2, BASE_COLOR_KEYS, false, 3, 4));
+  // Níveis 16–20: 3 espaços, 4 cores, sempre no final, 4 opções
+  for (let i = 0; i < 5; i++) rounds.push(generatePattern(4, 3, BASE_COLOR_KEYS, false, 2, 4));
+  // Níveis 21–24: 2 espaços, posição aleatória, 5 opções (com preto/roxo)
+  for (let i = 0; i < 4; i++) rounds.push(generatePattern(4, 2, FULL_COLOR_KEYS, true, 3, 5));
+  // Níveis 25–30: 4 espaços, posição aleatória, 5 opções (com preto/roxo)
+  for (let i = 0; i < 6; i++) rounds.push(generatePattern(5, 4, FULL_COLOR_KEYS, true, 3, 5));
+}
+
+function tierLabel(index) {
+  if (index < 5) return 'Nível fácil · 1 espaço';
+  if (index < 10) return 'Nível fácil · 1 espaço, 3 cores';
+  if (index < 15) return 'Nível médio · 2 espaços';
+  if (index < 20) return 'Nível difícil · 3 espaços';
+  if (index < 24) return 'Nível avançado · posição aleatória, 5 opções';
+  return 'Nível expert · 4 espaços, 5 opções';
+}
+
+function renderHeaderGame() {
+  const hr = document.getElementById('header-right');
+  hr.innerHTML = `
+    <div class="progress" id="progress"></div>
+    <button class="restart-header-btn" id="restart-header-btn">Reiniciar</button>
+  `;
+  document.getElementById('restart-header-btn').addEventListener('click', showStartScreen);
+}
+
+function renderProgress() {
+  const progressEl = document.getElementById('progress');
+  if (!progressEl) return;
+  progressEl.innerHTML =
+    `Padrão ${currentRound + 1} de ${TOTAL_ROUNDS}<span class="tier">${tierLabel(currentRound)}</span>`;
+
+  const bar = document.getElementById('dots-bar');
+  bar.innerHTML = '';
+  for (let i = 0; i < TOTAL_ROUNDS; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot';
+    if (i < currentRound) d.classList.add('done');
+    if (i === currentRound) d.classList.add('current');
+    bar.appendChild(d);
+  }
+}
+
+function renderRound() {
+  renderHeaderGame();
+
+  const area = document.getElementById('game-area');
+  const round = rounds[currentRound];
+
+  currentAnswers = round.answers;
+  filledAnswers = new Array(round.numBlanks).fill(null);
+  activeBlankIndex = 0;
+  roundFinished = false;
+
+  area.innerHTML = `
+    <p class="pattern-label">Complete o padrão</p>
+    <div class="pattern-row" id="pattern-row"></div>
+    <p class="options-label">Escolha as cores, em ordem</p>
+    <div class="options-row" id="options-row"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="answer-reveal" id="answer-reveal"></div>
+    <div class="controls">
+      <button class="clear-btn hidden" id="clear-btn">Limpar</button>
+      <button class="next-btn" id="next-btn">Próximo padrão</button>
+    </div>
+  `;
+
+  const patternRow = document.getElementById('pattern-row');
+
+  round.visibleBefore.forEach(color => {
+    const dot = document.createElement('div');
+    dot.className = `dot ${COLORS[color].class}`;
+    patternRow.appendChild(dot);
+  });
+
+  for (let i = 0; i < round.numBlanks; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot blank';
+    dot.id = `blank-${i}`;
+    if (i === 0) dot.classList.add('active');
+    patternRow.appendChild(dot);
+  }
+
+  round.visibleAfter.forEach(color => {
+    const dot = document.createElement('div');
+    dot.className = `dot ${COLORS[color].class}`;
+    patternRow.appendChild(dot);
+  });
+
+  const optionsRow = document.getElementById('options-row');
+  round.optionColors.forEach(color => {
+    const btn = document.createElement('button');
+    btn.className = `option ${COLORS[color].class}`;
+    btn.addEventListener('click', () => handlePick(color));
+    optionsRow.appendChild(btn);
+  });
+
+  document.getElementById('next-btn').addEventListener('click', goNext);
+  document.getElementById('clear-btn').addEventListener('click', clearRound);
+
+  renderProgress();
+}
+
+function handlePick(color) {
+  if (roundFinished || activeBlankIndex >= filledAnswers.length) return;
+
+  filledAnswers[activeBlankIndex] = color;
+  const blankEl = document.getElementById(`blank-${activeBlankIndex}`);
+  blankEl.classList.remove('active');
+  blankEl.classList.add(COLORS[color].class, 'filled');
+
+  document.getElementById('clear-btn').classList.remove('hidden');
+
+  activeBlankIndex++;
+
+  if (activeBlankIndex < filledAnswers.length) {
+    document.getElementById(`blank-${activeBlankIndex}`).classList.add('active');
+  } else {
+    evaluateRound();
+  }
+}
+
+function clearRound() {
+  if (roundFinished) return;
+  const round = rounds[currentRound];
+  filledAnswers = new Array(round.numBlanks).fill(null);
+  activeBlankIndex = 0;
+
+  for (let i = 0; i < round.numBlanks; i++) {
+    const blankEl = document.getElementById(`blank-${i}`);
+    blankEl.className = 'dot blank';
+    if (i === 0) blankEl.classList.add('active');
+  }
+
+  document.getElementById('clear-btn').classList.add('hidden');
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('answer-reveal').innerHTML = '';
+}
+
+function evaluateRound() {
+  roundFinished = true;
+  document.getElementById('clear-btn').classList.add('hidden');
+
+  let correctCount = 0;
+  for (let i = 0; i < currentAnswers.length; i++) {
+    const blankEl = document.getElementById(`blank-${i}`);
+    if (filledAnswers[i] === currentAnswers[i]) {
+      blankEl.classList.add('correct');
+      correctCount++;
+    } else {
+      blankEl.classList.add('incorrect');
+    }
+  }
+
+  const feedback = document.getElementById('feedback');
+  const allCorrect = correctCount === currentAnswers.length;
+
+  if (allCorrect) {
+    score++;
+    feedback.textContent = 'Certo! Padrão completo.';
+    feedback.className = 'feedback correct';
+  } else {
+    feedback.textContent = `Quase lá — ${correctCount} de ${currentAnswers.length} corretos. Veja a resposta certa abaixo.`;
+    feedback.className = 'feedback incorrect';
+
+    const reveal = document.getElementById('answer-reveal');
+    reveal.innerHTML = `
+      <p class="answer-label">Resposta correta</p>
+      <div class="answer-row" id="answer-row"></div>
+    `;
+    const answerRow = document.getElementById('answer-row');
+    currentAnswers.forEach(color => {
+      const dot = document.createElement('div');
+      dot.className = `dot mini ${COLORS[color].class}`;
+      answerRow.appendChild(dot);
+    });
+  }
+
+  document.getElementById('next-btn').classList.add('visible');
+}
+
+function goNext() {
+  currentRound++;
+  if (currentRound >= TOTAL_ROUNDS) {
+    renderFinal();
+  } else {
+    renderRound();
+  }
+}
+
+function getFinalMessage(s) {
+  const pct = s / TOTAL_ROUNDS;
+  if (pct <= 0.25) {
+    return {
+      emoji: '😕',
+      title: 'Não foi dessa vez',
+      text: 'Foi bem difícil essa rodada. Que tal tentar de novo e prestar mais atenção nos padrões?'
+    };
+  }
+  if (pct <= 0.5) {
+    return {
+      emoji: '😐',
+      title: 'Quase lá',
+      text: 'Deu pra ir levando, mas ainda dá pra melhorar bastante. Bora tentar de novo?'
+    };
+  }
+  if (pct <= 0.75) {
+    return {
+      emoji: '🙂',
+      title: 'Mandou bem!',
+      text: 'Um desempenho mediano, mas sólido. Mais um pouco de prática e você chega no topo.'
+    };
+  }
+  return {
+    emoji: '🎉',
+    title: 'Parabéns, mandou muito bem!!',
+    text: 'Você arrasou nos padrões de cores! Reconhecimento de padrão afiadíssimo.'
+  };
+}
+
+function renderFinal() {
+  document.getElementById('header-right').innerHTML = '';
+
+  const area = document.getElementById('game-area');
+  const msg = getFinalMessage(score);
+  area.innerHTML = `
+    <div class="final">
+      <div class="final-emoji">${msg.emoji}</div>
+      <h2>${msg.title}</h2>
+      <p class="final-score">Você acertou ${score} de ${TOTAL_ROUNDS} padrões.</p>
+      <p>${msg.text}</p>
+      <div class="final-buttons">
+        <button class="restart-btn" id="play-again-btn">Jogar novamente</button>
+        <button class="restart-btn secondary" id="back-menu-btn">Voltar ao início</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('play-again-btn').addEventListener('click', startGame);
+  document.getElementById('back-menu-btn').addEventListener('click', showStartScreen);
+
+  const bar = document.getElementById('dots-bar');
+  bar.innerHTML = '';
+  for (let i = 0; i < TOTAL_ROUNDS; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot done';
+    bar.appendChild(d);
+  }
+}
+
+function startGame() {
+  currentRound = 0;
+  score = 0;
+  buildRounds();
+  renderRound();
+}
+
+function showStartScreen() {
+  document.getElementById('header-right').innerHTML = '';
+  document.getElementById('dots-bar').innerHTML = '';
+
+  const previewColors = ['c-red', 'c-blue', 'c-green', 'c-yellow', 'c-purple'];
+
+  const area = document.getElementById('game-area');
+  area.innerHTML = `
+    <div class="start-screen">
+      <div class="start-dots">
+        ${previewColors.map(c => `<div class="dot ${c}"></div>`).join('')}
+      </div>
+      <h2>Treine seu olho para padrões</h2>
+      <p>Observe a sequência de cores e complete os espaços em branco na ordem certa. São 30 padrões, ficando mais difícil a cada nível — nos últimos, os espaços podem aparecer em qualquer parte da sequência.</p>
+      <button class="play-btn" id="play-btn">PLAY</button>
+    </div>
+  `;
+  document.getElementById('play-btn').addEventListener('click', startGame);
+}
+
+showStartScreen();
+</script>
+
+</body>
+</html>
