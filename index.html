@@ -79,6 +79,16 @@
     margin-top: 2px;
   }
 
+  .timer-badge {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 0.85rem;
+    color: var(--ink);
+    background: var(--accent-soft);
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-variant-numeric: tabular-nums;
+  }
+
   .restart-header-btn {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 0.78rem;
@@ -310,6 +320,52 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .times-section {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .times-summary {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    margin: 0 0 18px 0;
+  }
+
+  .times-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    text-align: left;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .time-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.78rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 10px;
+  }
+
+  .time-item-label {
+    color: var(--muted);
+  }
+
+  .time-item-value {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
   }
 
   .dots-bar {
@@ -406,6 +462,11 @@ let filledAnswers = [];
 let activeBlankIndex = 0;
 let roundFinished = false;
 
+let timerInterval = null;
+let gameStartTime = null;
+let lastSplitTime = null;
+let roundTimes = [];
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -417,6 +478,38 @@ function shuffle(arr) {
 
 function pickColors(n, pool) {
   return shuffle(pool).slice(0, n);
+}
+
+function formatTime(seconds) {
+  return seconds.toFixed(1) + 's';
+}
+
+function startGameTimer() {
+  clearInterval(timerInterval);
+  gameStartTime = Date.now();
+  lastSplitTime = gameStartTime;
+  updateTimerDisplay(0);
+  timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - gameStartTime) / 1000;
+    updateTimerDisplay(elapsed);
+  }, 100);
+}
+
+function stopGameTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+function recordSplit() {
+  const now = Date.now();
+  const elapsed = (now - lastSplitTime) / 1000;
+  lastSplitTime = now;
+  return elapsed;
+}
+
+function updateTimerDisplay(seconds) {
+  const el = document.getElementById('timer-display');
+  if (el) el.textContent = formatTime(seconds);
 }
 
 // Gera um padrão cíclico. Se randomPosition=false, os espaços ficam sempre
@@ -486,6 +579,7 @@ function tierLabel(index) {
 function renderHeaderGame() {
   const hr = document.getElementById('header-right');
   hr.innerHTML = `
+    <div class="timer-badge" id="timer-display">0.0s</div>
     <div class="progress" id="progress"></div>
     <button class="restart-header-btn" id="restart-header-btn">Reiniciar</button>
   `;
@@ -610,6 +704,9 @@ function evaluateRound() {
   roundFinished = true;
   document.getElementById('clear-btn').classList.add('hidden');
 
+  const elapsed = recordSplit();
+  roundTimes[currentRound] = elapsed;
+
   let correctCount = 0;
   for (let i = 0; i < currentAnswers.length; i++) {
     const blankEl = document.getElementById(`blank-${i}`);
@@ -688,10 +785,19 @@ function getFinalMessage(s) {
 }
 
 function renderFinal() {
+  stopGameTimer();
   document.getElementById('header-right').innerHTML = '';
 
   const area = document.getElementById('game-area');
   const msg = getFinalMessage(score);
+
+  const totalTime = roundTimes.reduce((sum, t) => sum + (t || 0), 0);
+  const avgTime = totalTime / TOTAL_ROUNDS;
+
+  const timesListHtml = roundTimes.map((t, i) =>
+    `<div class="time-item"><span class="time-item-label">Padrão ${i + 1}</span><span class="time-item-value">${formatTime(t || 0)}</span></div>`
+  ).join('');
+
   area.innerHTML = `
     <div class="final">
       <div class="final-emoji">${msg.emoji}</div>
@@ -701,6 +807,11 @@ function renderFinal() {
       <div class="final-buttons">
         <button class="restart-btn" id="play-again-btn">Jogar novamente</button>
         <button class="restart-btn secondary" id="back-menu-btn">Voltar ao início</button>
+      </div>
+      <div class="times-section">
+        <p class="times-summary">Tempo total: ${formatTime(totalTime)} · Média por padrão: ${formatTime(avgTime)}</p>
+        <p class="answer-label">Tempo de cada padrão</p>
+        <div class="times-list">${timesListHtml}</div>
       </div>
     </div>
   `;
@@ -719,11 +830,14 @@ function renderFinal() {
 function startGame() {
   currentRound = 0;
   score = 0;
+  roundTimes = [];
   buildRounds();
   renderRound();
+  startGameTimer();
 }
 
 function showStartScreen() {
+  stopGameTimer();
   document.getElementById('header-right').innerHTML = '';
   document.getElementById('dots-bar').innerHTML = '';
 
@@ -736,7 +850,7 @@ function showStartScreen() {
         ${previewColors.map(c => `<div class="dot ${c}"></div>`).join('')}
       </div>
       <h2>Treine seu olho para padrões</h2>
-      <p>Observe a sequência de cores e complete os espaços em branco na ordem certa. São 30 padrões, ficando mais difícil a cada nível — nos últimos, os espaços podem aparecer em qualquer parte da sequência.</p>
+      <p>Observe a sequência de cores e complete os espaços em branco na ordem certa. 30 padrões aleatórios, ficando mais difícil a cada nível.</p>
       <button class="play-btn" id="play-btn">PLAY</button>
     </div>
   `;
