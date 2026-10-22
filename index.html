@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -10,19 +10,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #232946;
-    --bg-deep: #1B2038;
-    --ink: #F5F6FC;
-    --muted: #ABB2D6;
-    --card: #2E3358;
-    --card-alt: #383E6C;
-    --border: #454C82;
+    --bg: #2A2F5C;
+    --bg-deep: #1E2247;
+    --ink: #FFFFFF;
+    --muted: #C3C8EE;
+    --card: #343A70;
+    --card-alt: #424A8A;
+    --border: #5560A8;
     --accent: #4ECDC4;
-    --accent-strong: #2FBFB4;
-    --accent-soft: rgba(78, 205, 196, 0.28);
-    --wrong: #FF6B6B;
-    --wrong-soft: rgba(255, 107, 107, 0.28);
+    --accent-strong: #2FA79F;
+    --accent-soft: rgba(78, 205, 196, 0.38);
+    --wrong: #FF9F68;
+    --wrong-soft: rgba(255, 159, 104, 0.38);
     --sun: #FFD166;
+    --sun-strong: #E5AE3C;
 
     --red: #FF0000;
     --blue: #0044FF;
@@ -30,151 +31,219 @@
     --yellow: #FFEA00;
     --black: #000000;
     --purple: #8C00FF;
+
+    --dot: 64px;
+    --opt: 70px;
   }
 
   * { box-sizing: border-box; }
 
+  html { font-size: 18px; }
+
   body {
     margin: 0;
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: linear-gradient(160deg, var(--bg) 0%, var(--bg-deep) 100%);
+    font-family: 'Baloo 2', 'Trebuchet MS', 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(circle at 12% 10%, rgba(140, 0, 255, 0.28) 0, transparent 38%),
+      radial-gradient(circle at 90% 88%, rgba(78, 205, 196, 0.24) 0, transparent 40%),
+      linear-gradient(160deg, var(--bg) 0%, var(--bg-deep) 100%);
+    background-attachment: fixed;
     color: var(--ink);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 20px;
+    line-height: 1.35;
   }
 
-  .wrap {
-    width: 100%;
-    max-width: 680px;
-  }
+  .wrap { width: 100%; max-width: 720px; }
 
+  /* ---------- Cabeçalho ---------- */
   header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
-    padding-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    margin-bottom: 14px;
   }
 
   h1 {
-    font-size: 1.7rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
+    font-size: 1.9rem;
+    font-weight: 800;
     margin: 0;
-    color: var(--ink);
-  }
-
-  h1 .accent-word {
-    color: var(--sun);
+    letter-spacing: 0.01em;
+    background: linear-gradient(90deg, #FF6B6B 0%, #FFD166 30%, #4ECDC4 60%, #B388FF 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 
   .header-right {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 
-  .progress {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 0.85rem;
-    color: var(--muted);
-    text-align: right;
-  }
-
-  .progress .tier {
-    display: block;
-    font-size: 0.72rem;
-    color: var(--accent);
-    margin-top: 2px;
-  }
-
-  .timer-badge {
-    font-family: 'Baloo 2', 'SF Mono', 'Consolas', monospace;
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--bg-deep);
-    background: var(--sun);
+  .pill {
+    font-weight: 800;
+    font-size: 1rem;
     border-radius: 999px;
-    padding: 6px 14px;
+    padding: 5px 14px;
     font-variant-numeric: tabular-nums;
-    box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+    box-shadow: 0 3px 0 rgba(0,0,0,0.22);
+    white-space: nowrap;
   }
+
+  .timer-badge { background: var(--sun); color: var(--bg-deep); }
+  .stars-badge { background: var(--card-alt); color: var(--sun); border: 2px solid var(--border); }
 
   .restart-header-btn {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 600;
-    font-size: 0.8rem;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.9rem;
     background: var(--card-alt);
-    color: var(--muted);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 7px 16px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-  }
-
-  .restart-header-btn:hover {
     color: var(--ink);
-    border-color: var(--accent);
-    transform: translateY(-1px);
+    border: 2px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 16px;
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.12s ease;
   }
+  .restart-header-btn:hover { transform: translateY(-2px); border-color: var(--accent); }
 
+  /* ---------- Banner do mundo + barra de progresso ---------- */
+  .world-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 3px solid var(--world, var(--accent));
+    border-radius: 20px;
+    padding: 8px 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.22);
+    animation: popIn 0.4s ease both;
+  }
+  .world-banner:empty { display: none; }
+  .world-emoji { font-size: 2rem; line-height: 1; }
+  .world-name { font-weight: 800; font-size: 1.1rem; color: var(--world, var(--ink)); line-height: 1.1; }
+  .world-sub { font-weight: 600; font-size: 0.85rem; color: var(--muted); }
+
+  .progress-bar {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .progress-bar:empty { display: none; }
+  .world-group { display: flex; gap: 4px; flex: 1; }
+  .seg {
+    flex: 1;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--card-alt);
+    transition: background 0.2s ease;
+  }
+  .seg.done { background: var(--c); }
+  .seg.current { background: var(--ink); box-shadow: 0 0 0 3px var(--c); }
+
+  /* ---------- Cartão principal ---------- */
   .card {
     background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 26px;
-    padding: 40px 32px;
-    box-shadow: 0 14px 34px rgba(9, 11, 26, 0.45);
+    border: 3px solid var(--border);
+    border-radius: 30px;
+    padding: 28px 26px 30px;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.22), 0 20px 40px rgba(9, 11, 26, 0.4);
   }
 
-  .pattern-label, .options-label, .answer-label {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 600;
-    font-size: 0.88rem;
-    color: var(--muted);
-    margin: 0 0 18px 0;
+  /* ---------- Mascote ---------- */
+  .mascot-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 26px;
   }
+  .mascot {
+    font-size: 3.2rem;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(0 4px 0 rgba(0,0,0,0.25));
+  }
+  .mascot.happy { animation: mascotHop 0.6s ease both; }
+  .mascot.sad { animation: wobble 0.6s ease both; }
 
+  .bubble {
+    position: relative;
+    background: var(--ink);
+    color: var(--bg-deep);
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 18px;
+    padding: 10px 16px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.22);
+    transition: background 0.2s ease;
+  }
+  .bubble::before {
+    content: "";
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 10px solid transparent;
+    border-left: 0;
+    border-right-color: var(--ink);
+    transition: border-right-color 0.2s ease;
+  }
+  .bubble.good { background: #B9F6CA; }
+  .bubble.good::before { border-right-color: #B9F6CA; }
+  .bubble.oops { background: #FFE0B2; }
+  .bubble.oops::before { border-right-color: #FFE0B2; }
+
+  /* ---------- Padrão e bolinhas ---------- */
   .pattern-row {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 44px;
-    min-height: 64px;
+    margin-bottom: 30px;
+    padding: 18px 10px;
+    background: rgba(0,0,0,0.16);
+    border-radius: 22px;
+    min-height: calc(var(--dot) + 36px);
+  }
+  .pattern-row.dense { --dot: 54px; gap: 10px; }
+
+  .options-label, .answer-label {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--muted);
+    text-align: center;
+    margin: 0 0 14px 0;
   }
 
   .options-row {
     display: flex;
-    gap: 16px;
+    gap: 18px;
     flex-wrap: wrap;
     justify-content: center;
   }
 
   .dot {
-    width: 58px;
-    height: 58px;
+    width: var(--dot);
+    height: var(--dot);
     border-radius: 50%;
-    border: 3px solid var(--ink);
+    border: 4px solid var(--ink);
     flex-shrink: 0;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
-    transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.28);
+    transition: transform 0.15s ease;
   }
 
-  .dot.blank {
-    position: relative;
-    box-shadow: none;
-  }
-
-  .dot.blank:not(.filled) {
-    background: var(--card-alt);
-    border-style: dashed;
-  }
-
+  .dot.blank { position: relative; box-shadow: none; }
+  .dot.blank:not(.filled) { background: var(--card-alt); border-style: dashed; }
   .dot.blank::after {
     content: "?";
     position: absolute;
@@ -182,67 +251,56 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 700;
-    font-size: 1.4rem;
+    font-weight: 800;
+    font-size: 1.7rem;
     color: var(--muted);
   }
-
-  .dot.blank.filled {
-    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
-    border-style: solid;
-  }
-
+  .dot.blank.filled { box-shadow: 0 5px 0 rgba(0,0,0,0.28); border-style: solid; }
   .dot.blank.filled::after { content: ""; }
-
-  @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 0 5px var(--accent-soft); }
-    50% { box-shadow: 0 0 0 9px var(--accent-soft); }
-  }
+  .dot.blank.pop { animation: pop 0.3s ease both; }
 
   .dot.blank.active {
-    border-color: var(--accent);
+    border-color: var(--sun);
     border-style: solid;
+    box-shadow: 0 0 0 6px rgba(255, 209, 102, 0.4);
     animation: pulseGlow 1.1s ease-in-out infinite;
   }
+  .dot.blank.active::after { color: var(--sun); }
 
   .dot.blank.correct {
-    box-shadow: 0 0 0 5px var(--accent-soft), 0 4px 0 rgba(0,0,0,0.25);
-    animation: none;
+    box-shadow: 0 0 0 7px var(--accent-soft), 0 5px 0 rgba(0,0,0,0.28);
+    animation: hop 0.5s ease both;
   }
-
   .dot.blank.incorrect {
-    box-shadow: 0 0 0 5px var(--wrong-soft), 0 4px 0 rgba(0,0,0,0.25);
-    animation: none;
+    box-shadow: 0 0 0 7px var(--wrong-soft), 0 5px 0 rgba(0,0,0,0.28);
+    animation: wobble 0.5s ease both;
   }
 
-  .dot.mini {
-    width: 34px;
-    height: 34px;
-    border-width: 2.5px;
-  }
+  .dot.mini { width: 42px; height: 42px; border-width: 3px; }
 
-  .answer-row {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 6px;
-  }
+  .answer-reveal { margin-top: 22px; text-align: center; }
+  .answer-reveal:empty { display: none; }
+  .answer-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
+  /* ---------- Botões de cor ---------- */
   .option {
-    width: 48px;
-    height: 48px;
+    width: var(--opt);
+    height: var(--opt);
     border-radius: 50%;
-    border: 3px solid var(--ink);
+    border: 5px solid var(--ink);
     cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.25);
+    box-shadow: 0 6px 0 rgba(0,0,0,0.28);
     transition: transform 0.12s ease, box-shadow 0.12s ease;
     padding: 0;
   }
-
-  .option:hover { transform: translateY(-4px) scale(1.05); }
-  .option:active { transform: translateY(0) scale(0.97); box-shadow: 0 2px 0 rgba(0,0,0,0.25); }
-  .option:disabled { cursor: default; opacity: 0.4; }
+  .option:hover { transform: translateY(-5px) scale(1.06); }
+  .option:active { transform: translateY(3px) scale(0.96); box-shadow: 0 2px 0 rgba(0,0,0,0.28); }
+  .option:focus-visible, .restart-btn:focus-visible, .play-btn:focus-visible,
+  .next-btn:focus-visible, .clear-btn:focus-visible, .restart-header-btn:focus-visible {
+    outline: 4px solid var(--sun);
+    outline-offset: 3px;
+  }
+  .option:disabled { cursor: default; opacity: 0.45; }
 
   .c-red { background: var(--red); }
   .c-blue { background: var(--blue); }
@@ -250,247 +308,196 @@
   .c-yellow { background: var(--yellow); }
   .c-black { background: var(--black); }
   .c-purple { background: var(--purple); }
-  .c-black { border-color: #9AA2CC; }
+  .c-black { border-color: #A9B1E0; }
 
-  .feedback {
-    margin-top: 28px;
-    text-align: center;
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    min-height: 24px;
-  }
-
-  .feedback.correct { color: var(--accent); }
-  .feedback.incorrect { color: var(--wrong); }
-
-  .answer-reveal {
-    margin-top: 18px;
-    text-align: center;
-  }
-
+  /* ---------- Controles ---------- */
   .controls {
     display: flex;
     justify-content: center;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 26px;
+    min-height: 56px;
   }
 
   .next-btn, .clear-btn {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 1.05rem;
     border: none;
     border-radius: 999px;
-    padding: 11px 26px;
+    padding: 11px 30px;
     cursor: pointer;
     transition: transform 0.12s ease;
   }
-
   .next-btn:hover, .clear-btn:hover { transform: translateY(-2px); }
 
   .next-btn {
     background: var(--accent);
     color: var(--bg-deep);
-    box-shadow: 0 4px 0 var(--accent-strong);
+    box-shadow: 0 5px 0 var(--accent-strong);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s ease, transform 0.12s ease;
   }
-
-  .next-btn.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  .next-btn.visible { opacity: 1; pointer-events: auto; animation: popIn 0.35s ease both; }
 
   .clear-btn {
     background: var(--card-alt);
-    color: var(--muted);
-    border: 1px solid var(--border);
+    color: var(--ink);
+    border: 2px solid var(--border);
+    font-size: 0.95rem;
   }
-
   .clear-btn.hidden { display: none; }
 
-  .final {
-    text-align: center;
-    padding: 40px 20px;
-  }
-
-  .final-emoji {
-    font-size: 3.4rem;
-    line-height: 1;
-    margin-bottom: 12px;
-  }
-
-  .final h2 {
-    font-weight: 700;
-    font-size: 1.7rem;
-    margin-bottom: 10px;
-    color: var(--ink);
-  }
-
-  .final-score {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--sun);
-    margin-bottom: 4px;
-  }
-
-  .final p {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    color: var(--muted);
-    margin-bottom: 24px;
-  }
+  /* ---------- Tela final ---------- */
+  .final { text-align: center; padding: 14px 6px 6px; }
+  .final .mascot-row { justify-content: center; margin-bottom: 14px; }
+  .final .mascot { font-size: 4.6rem; animation: mascotHop 0.9s ease both; }
+  .final h2 { font-weight: 800; font-size: 1.9rem; margin: 0 0 6px; }
+  .final-stars { font-size: 2.2rem; letter-spacing: 4px; margin: 4px 0 6px; }
+  .final-stars .off { filter: grayscale(1); opacity: 0.35; }
+  .final-score { font-weight: 800; font-size: 1.15rem; color: var(--sun); margin: 0 0 6px; }
+  .final p.final-text { color: var(--muted); font-weight: 600; margin: 0 auto 22px; max-width: 460px; }
 
   .restart-btn, .play-btn {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 700;
+    font-family: inherit;
+    font-weight: 800;
     background: var(--accent);
     color: var(--bg-deep);
     border: none;
     border-radius: 999px;
-    padding: 13px 30px;
-    font-size: 0.98rem;
+    padding: 13px 34px;
+    font-size: 1.1rem;
     cursor: pointer;
-    box-shadow: 0 5px 0 var(--accent-strong);
+    box-shadow: 0 6px 0 var(--accent-strong);
     transition: transform 0.12s ease;
   }
-
-  .restart-btn:hover, .play-btn:hover { transform: translateY(-2px); }
-  .restart-btn:active, .play-btn:active { transform: translateY(1px); box-shadow: 0 3px 0 var(--accent-strong); }
+  .restart-btn:hover, .play-btn:hover { transform: translateY(-3px); }
+  .restart-btn:active, .play-btn:active { transform: translateY(2px); box-shadow: 0 3px 0 var(--accent-strong); }
 
   .restart-btn.secondary {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    box-shadow: none;
-    margin-left: 10px;
+    background: var(--card-alt);
+    color: var(--ink);
+    border: 2px solid var(--border);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.22);
   }
 
-  .final-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 8px;
-  }
+  .final-buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
 
-  .times-section {
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-  }
-
-  .times-summary {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 600;
-    font-size: 0.88rem;
-    color: var(--sun);
-    margin: 0 0 18px 0;
-  }
+  .times-section { margin-top: 28px; padding-top: 20px; border-top: 3px dashed var(--border); }
+  .times-summary { font-weight: 800; font-size: 1rem; color: var(--sun); margin: 0 0 14px; }
 
   .times-list {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     text-align: left;
-    max-height: 260px;
+    max-height: 250px;
     overflow-y: auto;
-    padding-right: 4px;
+    padding: 2px 4px 2px 2px;
   }
-
   .time-item {
     display: flex;
     justify-content: space-between;
     gap: 8px;
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     background: var(--card-alt);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 7px 10px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 6px 10px;
   }
+  .time-item-label { color: var(--muted); font-weight: 600; }
+  .time-item-value { color: var(--accent); font-weight: 800; font-variant-numeric: tabular-nums; }
 
-  .time-item-label {
-    color: var(--muted);
-    font-weight: 600;
-  }
+  /* ---------- Tela inicial ---------- */
+  .start-screen { text-align: center; padding: 10px 6px 4px; }
+  .start-screen .mascot-row { justify-content: center; margin-bottom: 18px; }
+  .start-screen .mascot { font-size: 4.4rem; animation: mascotHop 1.4s ease-in-out infinite; }
 
-  .time-item-value {
-    font-family: 'Baloo 2', 'SF Mono', 'Consolas', monospace;
-    color: var(--accent);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .dots-bar {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    margin-top: 24px;
-    flex-wrap: wrap;
-  }
-
-  .step-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--card-alt);
-  }
-
-  .step-dot.done { background: var(--accent); }
-  .step-dot.current { background: var(--sun); }
-
-  /* Tela inicial */
-  .start-screen {
-    text-align: center;
-    padding: 56px 24px;
-  }
-
-  .start-dots {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-
-  @keyframes bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .start-dots .dot {
-    width: 34px;
-    height: 34px;
-    animation: bob 1.6s ease-in-out infinite;
-  }
-
+  .start-dots { display: flex; justify-content: center; gap: 14px; margin: 6px 0 22px; flex-wrap: wrap; }
+  .start-dots .dot { width: 42px; height: 42px; animation: bob 1.6s ease-in-out infinite; }
   .start-dots .dot:nth-child(1) { animation-delay: 0s; }
   .start-dots .dot:nth-child(2) { animation-delay: 0.15s; }
   .start-dots .dot:nth-child(3) { animation-delay: 0.3s; }
   .start-dots .dot:nth-child(4) { animation-delay: 0.45s; }
   .start-dots .dot:nth-child(5) { animation-delay: 0.6s; }
 
-  .start-screen h2 {
-    font-weight: 700;
-    font-size: 1.8rem;
-    margin: 0 0 12px 0;
-    color: var(--ink);
-  }
-
-  .start-screen p {
-    font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  .start-screen h2 { font-weight: 800; font-size: 2rem; margin: 0 0 10px; }
+  .start-screen p.start-text {
     color: var(--muted);
-    font-size: 0.95rem;
-    max-width: 420px;
-    margin: 0 auto 30px auto;
-    line-height: 1.6;
+    font-weight: 600;
+    font-size: 1.02rem;
+    max-width: 460px;
+    margin: 0 auto 26px;
+    line-height: 1.5;
+  }
+  .play-btn { font-size: 1.5rem; padding: 14px 54px; letter-spacing: 0.04em; }
+
+  /* ---------- Confete ---------- */
+  .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+  .confetti span {
+    position: absolute;
+    top: -20px;
+    width: 11px;
+    height: 16px;
+    border-radius: 3px;
+    animation: fall linear forwards;
   }
 
-  .play-btn {
-    font-size: 1.1rem;
-    padding: 15px 46px;
-    letter-spacing: 0.03em;
+  /* ---------- Animações ---------- */
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 5px rgba(255, 209, 102, 0.40); }
+    50%      { box-shadow: 0 0 0 11px rgba(255, 209, 102, 0.22); }
+  }
+  @keyframes pop {
+    0%   { transform: scale(0.6); }
+    70%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  @keyframes popIn {
+    0%   { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes hop {
+    0%, 100% { transform: translateY(0); }
+    40%      { transform: translateY(-14px); }
+    70%      { transform: translateY(-3px); }
+  }
+  @keyframes wobble {
+    0%, 100% { transform: rotate(0); }
+    25%      { transform: rotate(-8deg); }
+    75%      { transform: rotate(8deg); }
+  }
+  @keyframes mascotHop {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    30%      { transform: translateY(-12px) rotate(-6deg); }
+    60%      { transform: translateY(0) rotate(5deg); }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); }
+  }
+
+  /* ---------- Telas pequenas ---------- */
+  @media (max-width: 560px) {
+    html { font-size: 16px; }
+    :root { --dot: 50px; --opt: 62px; }
+    body { padding: 12px; align-items: flex-start; }
+    .card { padding: 20px 14px 24px; border-radius: 24px; }
+    .pattern-row.dense { --dot: 42px; gap: 8px; }
+    .options-row { gap: 12px; }
+    .times-list { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 1.5rem; }
+    .mascot { font-size: 2.6rem; }
+    .start-screen .mascot { font-size: 3.6rem; }
+    .final .mascot { font-size: 3.8rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
@@ -502,25 +509,54 @@
     <div class="header-right" id="header-right"></div>
   </header>
 
-  <div class="card" id="game-area"></div>
+  <div class="world-banner" id="world-banner"></div>
+  <div class="progress-bar" id="dots-bar"></div>
 
-  <div class="dots-bar" id="dots-bar"></div>
+  <div class="card" id="game-area"></div>
 </div>
 
 <script>
 const COLORS = {
-  red:    { class: 'c-red' },
-  blue:   { class: 'c-blue' },
-  green:  { class: 'c-green' },
-  yellow: { class: 'c-yellow' },
-  black:  { class: 'c-black' },
-  purple: { class: 'c-purple' }
+  red:    { class: 'c-red',    name: 'Vermelho' },
+  blue:   { class: 'c-blue',   name: 'Azul' },
+  green:  { class: 'c-green',  name: 'Verde' },
+  yellow: { class: 'c-yellow', name: 'Amarelo' },
+  black:  { class: 'c-black',  name: 'Preto' },
+  purple: { class: 'c-purple', name: 'Roxo' }
 };
 
 const BASE_COLOR_KEYS = ['red', 'blue', 'green', 'yellow'];
 const FULL_COLOR_KEYS = ['red', 'blue', 'green', 'yellow', 'black', 'purple'];
 
-const TOTAL_ROUNDS = 30;
+const TOTAL_ROUNDS = 20;
+const ROUNDS_PER_WORLD = 5;
+
+// Um "mundo" a cada 5 padrões: é aqui que a dificuldade sobe.
+const WORLDS = [
+  { emoji: '🌱', name: 'Mundo Verde',    color: '#5BE37D' },
+  { emoji: '🚀', name: 'Mundo Aventura', color: '#4DB8FF' },
+  { emoji: '🔮', name: 'Mundo Mágico',   color: '#C58BFF' },
+  { emoji: '👑', name: 'Mundo Campeão',  color: '#FFD166' }
+];
+
+const PROMPTS = [
+  'Qual cor vem agora? 🤔',
+  'Descubra o padrão! 🔍',
+  'Olhe bem as cores! 👀',
+  'Você consegue! 💪',
+  'Quais cores faltam? 🧩'
+];
+const CORRECT_MSGS = [
+  'Isso aí! Você acertou! 🎉',
+  'Muito bem! ⭐',
+  'Incrível! Você é demais! 🌟',
+  'Acertou em cheio! 🎯',
+  'Que esperto! 🦉'
+];
+// Mascote: o Pipo, a corujinha
+const MASCOT = '🦉';
+
+const CONFETTI_COLORS = ['#FF4D4D', '#FFD166', '#4ECDC4', '#4DB8FF', '#C58BFF', '#5BE37D'];
 
 let currentRound = 0;
 let score = 0;
@@ -545,9 +581,15 @@ function shuffle(arr) {
   return a;
 }
 
+function pickRandom(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
 function pickColors(n, pool) {
   return shuffle(pool).slice(0, n);
 }
+
+/* ---------------- Cronômetro (contínuo) ---------------- */
 
 function formatTime(seconds) {
   return seconds.toFixed(1) + 's';
@@ -559,8 +601,7 @@ function startGameTimer() {
   lastSplitTime = gameStartTime;
   updateTimerDisplay(0);
   timerInterval = setInterval(() => {
-    const elapsed = (Date.now() - gameStartTime) / 1000;
-    updateTimerDisplay(elapsed);
+    updateTimerDisplay((Date.now() - gameStartTime) / 1000);
   }, 100);
 }
 
@@ -578,8 +619,10 @@ function recordSplit() {
 
 function updateTimerDisplay(seconds) {
   const el = document.getElementById('timer-display');
-  if (el) el.textContent = formatTime(seconds);
+  if (el) el.textContent = '⏱️ ' + formatTime(seconds);
 }
+
+/* ---------------- Geração dos padrões ---------------- */
 
 // Gera um padrão cíclico. Se randomPosition=false, os espaços ficam sempre
 // no final da sequência. Se true, o bloco de espaços pode aparecer em
@@ -622,55 +665,109 @@ function generatePattern(numColors, numBlanks, pool, randomPosition, repeats, op
 
 function buildRounds() {
   rounds = [];
-  // Níveis 1–5: 1 espaço, 2 cores, sempre no final, 4 opções
+  // Padrões 1–5:   1 espaço,  2 cores, sempre no final,      4 opções
   for (let i = 0; i < 5; i++) rounds.push(generatePattern(2, 1, BASE_COLOR_KEYS, false, 6, 4));
-  // Níveis 6–10: 1 espaço, 3 cores, sempre no final, 4 opções
-  for (let i = 0; i < 5; i++) rounds.push(generatePattern(3, 1, BASE_COLOR_KEYS, false, 3, 4));
-  // Níveis 11–15: 2 espaços, 3 cores, sempre no final, 4 opções
-  for (let i = 0; i < 5; i++) rounds.push(generatePattern(3, 2, BASE_COLOR_KEYS, false, 3, 4));
-  // Níveis 16–20: 3 espaços, 4 cores, sempre no final, 4 opções
-  for (let i = 0; i < 5; i++) rounds.push(generatePattern(4, 3, BASE_COLOR_KEYS, false, 2, 4));
-  // Níveis 21–24: 2 espaços, posição aleatória, 5 opções (com preto/roxo)
-  for (let i = 0; i < 4; i++) rounds.push(generatePattern(4, 2, FULL_COLOR_KEYS, true, 3, 5));
-  // Níveis 25–30: 4 espaços, posição aleatória, 5 opções (com preto/roxo)
-  for (let i = 0; i < 6; i++) rounds.push(generatePattern(5, 4, FULL_COLOR_KEYS, true, 3, 5));
+  // Padrões 6–10:  2 espaços, 3 cores, sempre no final,      4 opções
+  for (let i = 0; i < 5; i++) rounds.push(generatePattern(3, 2, BASE_COLOR_KEYS, false, 4, 4));
+  // Padrões 11–15: 3 espaços, 4 cores (com preto/roxo), posição aleatória, 5 opções
+  for (let i = 0; i < 5; i++) rounds.push(generatePattern(4, 3, FULL_COLOR_KEYS, true, 3, 5));
+  // Padrões 16–20: 4 espaços, 5 cores (com preto/roxo), posição aleatória, 5 opções
+  for (let i = 0; i < 5; i++) rounds.push(generatePattern(5, 4, FULL_COLOR_KEYS, true, 3, 5));
 }
 
-function tierLabel(index) {
-  if (index < 5) return 'Nível fácil · 1 espaço';
-  if (index < 10) return 'Nível fácil · 1 espaço, 3 cores';
-  if (index < 15) return 'Nível médio · 2 espaços';
-  if (index < 20) return 'Nível difícil · 3 espaços';
-  if (index < 24) return 'Nível avançado · posição aleatória, 5 opções';
-  return 'Nível expert · 4 espaços, 5 opções';
+/* ---------------- Cabeçalho, mundos e progresso ---------------- */
+
+function worldIndexOf(round) {
+  return Math.min(WORLDS.length - 1, Math.floor(round / ROUNDS_PER_WORLD));
 }
 
 function renderHeaderGame() {
   const hr = document.getElementById('header-right');
   hr.innerHTML = `
-    <div class="timer-badge" id="timer-display">0.0s</div>
-    <div class="progress" id="progress"></div>
+    <div class="pill stars-badge" id="stars-display">⭐ ${score}</div>
+    <div class="pill timer-badge" id="timer-display">⏱️ 0.0s</div>
     <button class="restart-header-btn" id="restart-header-btn">Reiniciar</button>
   `;
   document.getElementById('restart-header-btn').addEventListener('click', showStartScreen);
 }
 
-function renderProgress() {
-  const progressEl = document.getElementById('progress');
-  if (!progressEl) return;
-  progressEl.innerHTML =
-    `Padrão ${currentRound + 1} de ${TOTAL_ROUNDS}<span class="tier">${tierLabel(currentRound)}</span>`;
+function updateStars() {
+  const el = document.getElementById('stars-display');
+  if (el) el.textContent = '⭐ ' + score;
+}
 
+function renderProgress() {
+  const w = WORLDS[worldIndexOf(currentRound)];
+  const blanks = rounds[currentRound].numBlanks;
+
+  const banner = document.getElementById('world-banner');
+  banner.style.setProperty('--world', w.color);
+  banner.innerHTML = `
+    <span class="world-emoji">${w.emoji}</span>
+    <div>
+      <div class="world-name">${w.name}</div>
+      <div class="world-sub">Padrão ${currentRound + 1} de ${TOTAL_ROUNDS} · Complete ${blanks} ${blanks === 1 ? 'espaço' : 'espaços'}</div>
+    </div>
+  `;
+  // reinicia a animação de entrada só quando muda de mundo
+  banner.style.animation = 'none';
+  void banner.offsetWidth;
+  banner.style.animation = '';
+
+  renderProgressBar(currentRound, false);
+}
+
+function renderProgressBar(current, allDone) {
   const bar = document.getElementById('dots-bar');
   bar.innerHTML = '';
-  for (let i = 0; i < TOTAL_ROUNDS; i++) {
-    const d = document.createElement('div');
-    d.className = 'step-dot';
-    if (i < currentRound) d.classList.add('done');
-    if (i === currentRound) d.classList.add('current');
-    bar.appendChild(d);
-  }
+  WORLDS.forEach((w, wi) => {
+    const group = document.createElement('div');
+    group.className = 'world-group';
+    for (let k = 0; k < ROUNDS_PER_WORLD; k++) {
+      const i = wi * ROUNDS_PER_WORLD + k;
+      const seg = document.createElement('div');
+      seg.className = 'seg';
+      seg.style.setProperty('--c', w.color);
+      if (allDone || i < current) seg.classList.add('done');
+      else if (i === current) seg.classList.add('current');
+      group.appendChild(seg);
+    }
+    bar.appendChild(group);
+  });
 }
+
+/* ---------------- Mascote ---------------- */
+
+function setMascot(text, mood) {
+  const bubble = document.getElementById('mascot-text');
+  const mascot = document.getElementById('mascot');
+  if (!bubble || !mascot) return;
+  bubble.textContent = text;
+  bubble.className = 'bubble' + (mood ? ' ' + mood : '');
+  mascot.textContent = MASCOT;
+  mascot.className = 'mascot';
+  void mascot.offsetWidth;
+  if (mood === 'good') mascot.classList.add('happy');
+  if (mood === 'oops') mascot.classList.add('sad');
+}
+
+function launchConfetti(count) {
+  const root = document.createElement('div');
+  root.className = 'confetti';
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('span');
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.background = pickRandom(CONFETTI_COLORS);
+    s.style.animationDuration = (1.4 + Math.random() * 1.4) + 's';
+    s.style.animationDelay = (Math.random() * 0.35) + 's';
+    s.style.transform = `rotate(${Math.random() * 360}deg)`;
+    root.appendChild(s);
+  }
+  document.body.appendChild(root);
+  setTimeout(() => root.remove(), 3600);
+}
+
+/* ---------------- Rodada ---------------- */
 
 function renderRound() {
   renderHeaderGame();
@@ -683,16 +780,21 @@ function renderRound() {
   activeBlankIndex = 0;
   roundFinished = false;
 
+  const totalDots = round.visibleBefore.length + round.numBlanks + round.visibleAfter.length;
+  const dense = totalDots > 10 ? ' dense' : '';
+
   area.innerHTML = `
-    <p class="pattern-label">Complete o padrão</p>
-    <div class="pattern-row" id="pattern-row"></div>
-    <p class="options-label">Escolha as cores, em ordem</p>
+    <div class="mascot-row">
+      <div class="mascot" id="mascot">${MASCOT}</div>
+      <div class="bubble" id="mascot-text"></div>
+    </div>
+    <div class="pattern-row${dense}" id="pattern-row"></div>
+    <p class="options-label">Toque nas cores, na ordem certa 👇</p>
     <div class="options-row" id="options-row"></div>
-    <div class="feedback" id="feedback"></div>
     <div class="answer-reveal" id="answer-reveal"></div>
     <div class="controls">
-      <button class="clear-btn hidden" id="clear-btn">Limpar</button>
-      <button class="next-btn" id="next-btn">Próximo padrão</button>
+      <button class="clear-btn hidden" id="clear-btn">🧽 Limpar</button>
+      <button class="next-btn" id="next-btn">Próximo ➜</button>
     </div>
   `;
 
@@ -722,6 +824,8 @@ function renderRound() {
   round.optionColors.forEach(color => {
     const btn = document.createElement('button');
     btn.className = `option ${COLORS[color].class}`;
+    btn.setAttribute('aria-label', COLORS[color].name);
+    btn.title = COLORS[color].name;
     btn.addEventListener('click', () => handlePick(color));
     optionsRow.appendChild(btn);
   });
@@ -730,6 +834,14 @@ function renderRound() {
   document.getElementById('clear-btn').addEventListener('click', clearRound);
 
   renderProgress();
+
+  // Mensagem do mascote: boas-vindas ao entrar num mundo novo, dicas nas demais
+  if (currentRound % ROUNDS_PER_WORLD === 0) {
+    const w = WORLDS[worldIndexOf(currentRound)];
+    setMascot(`Bem-vindo ao ${w.name}! ${w.emoji}`, '');
+  } else {
+    setMascot(pickRandom(PROMPTS), '');
+  }
 }
 
 function handlePick(color) {
@@ -738,7 +850,7 @@ function handlePick(color) {
   filledAnswers[activeBlankIndex] = color;
   const blankEl = document.getElementById(`blank-${activeBlankIndex}`);
   blankEl.classList.remove('active');
-  blankEl.classList.add(COLORS[color].class, 'filled');
+  blankEl.classList.add(COLORS[color].class, 'filled', 'pop');
 
   document.getElementById('clear-btn').classList.remove('hidden');
 
@@ -764,9 +876,8 @@ function clearRound() {
   }
 
   document.getElementById('clear-btn').classList.add('hidden');
-  document.getElementById('feedback').textContent = '';
-  document.getElementById('feedback').className = 'feedback';
   document.getElementById('answer-reveal').innerHTML = '';
+  setMascot(pickRandom(PROMPTS), '');
 }
 
 function evaluateRound() {
@@ -779,6 +890,8 @@ function evaluateRound() {
   let correctCount = 0;
   for (let i = 0; i < currentAnswers.length; i++) {
     const blankEl = document.getElementById(`blank-${i}`);
+    blankEl.classList.remove('pop');
+    blankEl.style.animationDelay = (i * 0.1) + 's';
     if (filledAnswers[i] === currentAnswers[i]) {
       blankEl.classList.add('correct');
       correctCount++;
@@ -787,20 +900,22 @@ function evaluateRound() {
     }
   }
 
-  const feedback = document.getElementById('feedback');
-  const allCorrect = correctCount === currentAnswers.length;
+  const total = currentAnswers.length;
 
-  if (allCorrect) {
+  if (correctCount === total) {
     score++;
-    feedback.textContent = 'Certo! Padrão completo.';
-    feedback.className = 'feedback correct';
+    updateStars();
+    setMascot(pickRandom(CORRECT_MSGS), 'good');
+    launchConfetti(28);
   } else {
-    feedback.textContent = `Quase lá — ${correctCount} de ${currentAnswers.length} corretos. Veja a resposta certa abaixo.`;
-    feedback.className = 'feedback incorrect';
+    const msg = correctCount === 0
+      ? 'Ops! Olha como era 👇 Você vai acertar o próximo!'
+      : `Quase! Você acertou ${correctCount} de ${total}. Olha como era 👇`;
+    setMascot(msg, 'oops');
 
     const reveal = document.getElementById('answer-reveal');
     reveal.innerHTML = `
-      <p class="answer-label">Resposta correta</p>
+      <p class="answer-label">Era assim:</p>
       <div class="answer-row" id="answer-row"></div>
     `;
     const answerRow = document.getElementById('answer-row');
@@ -811,7 +926,9 @@ function evaluateRound() {
     });
   }
 
-  document.getElementById('next-btn').classList.add('visible');
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.textContent = currentRound === TOTAL_ROUNDS - 1 ? 'Ver meu resultado 🏆' : 'Próximo ➜';
+  nextBtn.classList.add('visible');
 }
 
 function goNext() {
@@ -823,42 +940,55 @@ function goNext() {
   }
 }
 
+/* ---------------- Tela final ---------------- */
+
 function getFinalMessage(s) {
   const pct = s / TOTAL_ROUNDS;
   if (pct <= 0.25) {
     return {
-      emoji: '😕',
-      title: 'Não foi dessa vez',
-      text: 'Foi bem difícil essa rodada. Que tal tentar de novo e prestar mais atenção nos padrões?'
+      emoji: '🥺',
+      title: 'Foi difícil, né?',
+      text: 'Mas é treinando que a gente fica cada vez mais esperto. Vamos tentar de novo?'
     };
   }
   if (pct <= 0.5) {
     return {
-      emoji: '😐',
-      title: 'Quase lá',
-      text: 'Deu pra ir levando, mas ainda dá pra melhorar bastante. Bora tentar de novo?'
+      emoji: '😊',
+      title: 'Está quase lá!',
+      text: 'Você já acertou bastante! Mais uma partida e você vai ainda melhor.'
     };
   }
   if (pct <= 0.75) {
     return {
-      emoji: '🙂',
+      emoji: '😄',
       title: 'Mandou bem!',
-      text: 'Um desempenho mediano, mas sólido. Mais um pouco de prática e você chega no topo.'
+      text: 'Muito legal o seu resultado! Falta só um pouquinho para ser campeão.'
     };
   }
   return {
-    emoji: '🎉',
-    title: 'Parabéns, mandou muito bem!!',
-    text: 'Você arrasou nos padrões de cores! Reconhecimento de padrão afiadíssimo.'
+    emoji: '🏆',
+    title: 'Você é incrível!',
+    text: 'Parabéns, campeão! Você descobriu quase todos os padrões!'
   };
 }
 
 function renderFinal() {
   stopGameTimer();
   document.getElementById('header-right').innerHTML = '';
+  document.getElementById('world-banner').innerHTML = '';
+  renderProgressBar(TOTAL_ROUNDS, true);
 
   const area = document.getElementById('game-area');
   const msg = getFinalMessage(score);
+  const pct = score / TOTAL_ROUNDS;
+
+  const pipoMood = pct > 0.5 ? 'good' : (pct > 0.25 ? 'normal' : 'oops');
+  const bubbleClass = pipoMood === 'good' ? ' good' : (pipoMood === 'oops' ? ' oops' : '');
+
+  const starCount = Math.round(pct * 5);
+  const starsHtml = Array.from({ length: 5 }, (_, i) =>
+    `<span class="${i < starCount ? 'on' : 'off'}">⭐</span>`
+  ).join('');
 
   const totalTime = roundTimes.reduce((sum, t) => sum + (t || 0), 0);
   const avgTime = totalTime / TOTAL_ROUNDS;
@@ -869,13 +999,16 @@ function renderFinal() {
 
   area.innerHTML = `
     <div class="final">
-      <div class="final-emoji">${msg.emoji}</div>
-      <h2>${msg.title}</h2>
-      <p class="final-score">Você acertou ${score} de ${TOTAL_ROUNDS} padrões.</p>
-      <p>${msg.text}</p>
+      <div class="mascot-row">
+        <div class="mascot">${MASCOT}</div>
+        <div class="bubble${bubbleClass}">${msg.text}</div>
+      </div>
+      <h2>${msg.emoji} ${msg.title}</h2>
+      <div class="final-stars">${starsHtml}</div>
+      <p class="final-score">Você acertou ${score} de ${TOTAL_ROUNDS} padrões!</p>
       <div class="final-buttons">
-        <button class="restart-btn" id="play-again-btn">Jogar novamente</button>
-        <button class="restart-btn secondary" id="back-menu-btn">Voltar ao início</button>
+        <button class="restart-btn" id="play-again-btn">🔁 Jogar de novo</button>
+        <button class="restart-btn secondary" id="back-menu-btn">🏠 Voltar ao início</button>
       </div>
       <div class="times-section">
         <p class="times-summary">Tempo total: ${formatTime(totalTime)} · Média por padrão: ${formatTime(avgTime)}</p>
@@ -887,14 +1020,11 @@ function renderFinal() {
   document.getElementById('play-again-btn').addEventListener('click', startGame);
   document.getElementById('back-menu-btn').addEventListener('click', showStartScreen);
 
-  const bar = document.getElementById('dots-bar');
-  bar.innerHTML = '';
-  for (let i = 0; i < TOTAL_ROUNDS; i++) {
-    const d = document.createElement('div');
-    d.className = 'step-dot done';
-    bar.appendChild(d);
-  }
+  if (pct > 0.75) launchConfetti(70);
+  else if (pct > 0.5) launchConfetti(35);
 }
+
+/* ---------------- Início ---------------- */
 
 function startGame() {
   currentRound = 0;
@@ -908,19 +1038,24 @@ function startGame() {
 function showStartScreen() {
   stopGameTimer();
   document.getElementById('header-right').innerHTML = '';
+  document.getElementById('world-banner').innerHTML = '';
   document.getElementById('dots-bar').innerHTML = '';
 
-  const previewColors = ['c-red', 'c-blue', 'c-green', 'c-yellow', 'c-purple'];
+  const previewColors = ['c-red', 'c-yellow', 'c-green', 'c-blue', 'c-purple'];
 
   const area = document.getElementById('game-area');
   area.innerHTML = `
     <div class="start-screen">
+      <div class="mascot-row">
+        <div class="mascot">${MASCOT}</div>
+        <div class="bubble">Oi! Eu sou o Pipo. Vamos brincar com as cores? 🎨</div>
+      </div>
       <div class="start-dots">
         ${previewColors.map(c => `<div class="dot ${c}"></div>`).join('')}
       </div>
       <h2>Treine seu olho para padrões</h2>
-      <p>Observe a sequência de cores e complete os espaços em branco na ordem certa. 30 padrões aleatórios, ficando mais difícil a cada nível, desafie sua mente.</p>
-      <button class="play-btn" id="play-btn">PLAY</button>
+      <p class="start-text">Observe a sequência de cores e complete os espaços em branco na ordem certa. 20 padrões aleatórios, ficando mais difícil a cada nível, desafie sua mente.</p>
+      <button class="play-btn" id="play-btn">▶ PLAY</button>
     </div>
   `;
   document.getElementById('play-btn').addEventListener('click', startGame);
