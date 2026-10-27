@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#24443B">
-<!-- O jogo já é escuro. Estas linhas avisam os navegadores (Chrome e outros) e a extensão Dark Reader para NÃO aplicar o
-     "modo escuro forçado" por cima. Alguns navegadores (Samsung Internet) ignoram o aviso: por isso as bolinhas
-     coloridas são pintadas em <canvas> (veja paintSwatch no JS), que o modo escuro forçado não altera. -->
 <meta name="color-scheme" content="dark">
 <meta name="darkreader-lock">
 <title>Padrões de Cores</title>
@@ -16,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    color-scheme: dark;   /* o jogo já é escuro: o navegador não deve "escurecer" as cores por conta própria */
+    color-scheme: dark;
     --bg: #24443B;
     --bg-deep: #17302A;
     --ink: #FFFFFF;
@@ -42,11 +39,12 @@
     --yellow: #FFEA00;
     --pink: #FF1493;
     --purple: #8C00FF;
+    --token: #F1E8D0;
 
     --dot: 64px;
     --opt: 70px;
 
-    --vvh: 100%;   /* altura da área visível; o JS troca por px quando as barras do navegador somem ou aparecem */
+    --vvh: 100%;
   }
   @supports (height: 100dvh) { :root { --vvh: 100dvh; } }
 
@@ -70,8 +68,6 @@
 
   .wrap { width: 100%; max-width: 720px; position: relative; z-index: 5; }
 
-  /* Jogo e tela inicial ocupam exatamente a tela: sem barra de rolagem.
-     (A tela de resultados rola normalmente, porque mostra tudo por inteiro.) */
   html[data-screen="play"], html[data-screen="start"] { height: 100%; overflow: hidden; overscroll-behavior: none; }
   html[data-screen="play"] body, html[data-screen="start"] body {
     display: block;
@@ -101,7 +97,7 @@
 
   .board-decor { position: fixed; top: 0; left: 0; right: 0; height: var(--vvh); pointer-events: none; z-index: 0; }
   .decor { position: absolute; display: none; }
-  .decor.rainbow  { top: 44px; left: 44px; width: 200px; }
+  .decor.rainbow  { top: 104px; left: 44px; width: 200px; }
   .decor.sun      { top: 36px; right: 44px; width: 150px; }
   .decor.seq-left { left: 54px; top: 50%; transform: translateY(-50%); width: 36px; }
   .decor.seq-right{ right: 54px; top: 50%; transform: translateY(-50%); width: 36px; }
@@ -156,7 +152,6 @@
     flex-wrap: wrap;
   }
 
-  /* Na tela inicial e na final não há contadores: o cabeçalho fica só com o título, centralizado */
   .header-right:empty { display: none; }
   html[data-screen="start"] header, html[data-screen="final"] header { justify-content: center; }
   html[data-screen="start"] h1, html[data-screen="final"] h1 { text-align: center; }
@@ -391,8 +386,6 @@
   .c-pink { background: var(--pink); }
   .c-purple { background: var(--purple); }
 
-  /* O miolo colorido é repintado num <canvas> por cima (função paintSwatch, no JS). Assim o "modo escuro forçado"
-     de alguns navegadores não consegue escurecer a cor da bolinha. O canvas é só uma amostra de cor esticada. */
   .dot, .option { position: relative; overflow: hidden; }
   .swatch {
     position: absolute;
@@ -404,6 +397,34 @@
     image-rendering: pixelated;
     pointer-events: none;
   }
+  .swatch.art { image-rendering: auto; }
+
+  /* ---------- Modo daltônico: bichinhos no lugar das cores ---------- */
+  html.animal-mode {
+    --red: var(--token);
+    --blue: var(--token);
+    --green: var(--token);
+    --yellow: var(--token);
+    --pink: var(--token);
+    --purple: var(--token);
+  }
+  /* certo ou errado também com símbolo (✓ ou ✕), e não só pela cor do brilho */
+  html.animal-mode .dot.blank.correct, html.animal-mode .dot.blank.incorrect { overflow: visible; }
+  html.animal-mode .dot.blank.correct::after, html.animal-mode .dot.blank.incorrect::after {
+    inset: auto;
+    top: -12%;
+    right: -12%;
+    z-index: 2;
+    width: max(18px, 42%);
+    height: max(18px, 42%);
+    border-radius: 50%;
+    border: 2px solid var(--bg-deep);
+    font-size: max(11px, calc(var(--dot) * 0.24));
+    line-height: 1;
+    color: var(--bg-deep);
+  }
+  html.animal-mode .dot.blank.correct::after { content: "✓"; background: var(--accent); }
+  html.animal-mode .dot.blank.incorrect::after { content: "✕"; background: var(--wrong); }
 
   /* ---------- Controles ---------- */
   .controls {
@@ -476,8 +497,6 @@
     box-shadow: 0 4px 0 rgba(0,0,0,0.22);
   }
 
-  /* Três botões lado a lado: Compartilhar (esquerda), Jogar de novo (meio) e Voltar ao início (direita).
-     Cada um é um "cartãozinho" com o emoji em cima e o texto embaixo, para caber os três até em celular de 320 px. */
   .final-buttons {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -490,7 +509,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;   /* os emojis ficam todos na mesma altura, mesmo com textos de 1 ou 2 linhas */
+    justify-content: flex-start;
     gap: 3px;
     padding: 12px 8px 14px;
     border-radius: 22px;
@@ -553,7 +572,7 @@
     justify-content: center;
     padding: 24px 18px;
     background: rgba(6, 18, 14, 0.86);
-    animation: shareFade 0.2s ease both;     /* só o fundo some/aparece; quem "pula" é o cartão */
+    animation: shareFade 0.2s ease both;
   }
   @keyframes shareFade { from { opacity: 0; } to { opacity: 1; } }
   .share-sheet {
@@ -613,7 +632,7 @@
   .help-fab {
     position: fixed;
     right: calc(36px + env(safe-area-inset-right, 0px));
-    bottom: calc(52px + env(safe-area-inset-bottom, 0px));       /* logo acima da bandeja de giz */
+    bottom: calc(52px + env(safe-area-inset-bottom, 0px));
     z-index: 45;
     display: inline-flex;
     align-items: center;
@@ -635,7 +654,6 @@
   .help-fab:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--sun-strong), 0 5px 10px rgba(0, 0, 0, 0.35); }
   .help-fab:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
   .help-fab .help-ico { font-size: 1.3em; line-height: 1; }
-  /* na tela inicial ele balança de leve de vez em quando, para chamar a atenção de quem está em dúvida */
   html[data-screen="start"] .help-fab { animation: helpWiggle 5s ease-in-out 2s infinite; }
   @keyframes helpWiggle {
     0%, 82%, 100% { transform: rotate(0); }
@@ -643,10 +661,68 @@
     90% { transform: rotate(5deg); }
     94% { transform: rotate(-3deg); }
   }
-  /* Na tela de resultados a página rola e tem uma lista de tempos: lá o botão não flutua por cima dela,
-     ele fica no canto inferior direito do FIM da página (a página ganha uma folga embaixo para ele). */
   html[data-screen="final"] body { position: relative; padding-bottom: 104px; }
-  html[data-screen="final"] .help-fab { position: absolute; }
+  html[data-screen="final"] .help-fab, html[data-screen="final"] .mode-fab { position: absolute; }
+
+  /* ---------- Botão "Modo daltônico" (fixo no canto superior esquerdo, em todas as telas) ---------- */
+  .mode-fab {
+    position: fixed;
+    left: calc(36px + env(safe-area-inset-left, 0px));
+    top: calc(36px + env(safe-area-inset-top, 0px));
+    z-index: 45;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 1.02rem;
+    line-height: 1.1;
+    color: var(--bg-deep);
+    background: var(--chalk);
+    border: none;
+    border-radius: 999px;
+    padding: 8px 9px 8px 13px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #B8AC88, 0 10px 20px rgba(0, 0, 0, 0.35);
+    transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .mode-fab:hover { transform: translateY(-3px); }
+  .mode-fab:active { transform: translateY(2px); box-shadow: 0 2px 0 #B8AC88, 0 5px 10px rgba(0, 0, 0, 0.35); }
+  .mode-fab:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
+  .mode-fab .mode-ico { font-size: 1.3em; line-height: 1; }
+  .mode-switch {
+    position: relative;
+    flex: none;
+    width: 46px;
+    height: 26px;
+    border-radius: 999px;
+    background: rgba(23, 48, 42, 0.3);
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+    transition: background-color 0.2s ease;
+  }
+  .mode-switch::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--bg-deep);
+    transition: transform 0.2s ease;
+  }
+  html.animal-mode .mode-fab { background: var(--accent); box-shadow: 0 5px 0 var(--accent-strong), 0 10px 20px rgba(0, 0, 0, 0.35); }
+  html.animal-mode .mode-fab:active { box-shadow: 0 2px 0 var(--accent-strong), 0 5px 10px rgba(0, 0, 0, 0.35); }
+  html.animal-mode .mode-switch { background: var(--bg-deep); }
+  html.animal-mode .mode-switch::after { content: "✓"; transform: translateX(20px); }
 
   /* ---------- Tutorial ("Como jogar") ---------- */
   .tut-modal {
@@ -661,7 +737,7 @@
     animation: shareFade 0.2s ease both;
   }
   .tut-sheet {
-    --tw: var(--chalk);                       /* cor da página: cada mundo usa a sua */
+    --tw: var(--chalk);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -708,7 +784,7 @@
   .tut-seg.current i { background: var(--tw); box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--tw); }
 
   .tut-bodywrap { position: relative; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-  .tut-bodywrap::after {          /* esmaece a beirada de baixo enquanto ainda tem mais para rolar */
+  .tut-bodywrap::after {
     content: "";
     position: absolute;
     left: 0; right: 0; bottom: 0;
@@ -719,8 +795,8 @@
     transition: opacity 0.2s ease;
   }
   .tut-bodywrap.has-more::after { opacity: 1; }
-  .tut-more {                      /* setinha ▼ "tem mais embaixo" (só aparece se a página não couber) */
-    pointer-events: none;          /* o dedo "atravessa" a setinha e rola a página; o toque nela é tratado em #tut-body (veja o JS) */
+  .tut-more {
+    pointer-events: none;
     position: absolute;
     left: 50%; bottom: 6px;
     z-index: 2;
@@ -741,7 +817,7 @@
   @media (prefers-reduced-motion: no-preference) { .tut-more { animation: tutNudge 1.4s ease-in-out infinite; } }
   @keyframes tutNudge { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 4px); } }
   .tut-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 8px 20px 14px; }
-  .tut-page { margin: auto 0; animation: tutIn 0.22s ease both; }      /* página mais curta que a janela: fica no meio; mais alta: a janela rola */
+  .tut-page { margin: auto 0; animation: tutIn 0.22s ease both; }
   @keyframes tutIn {
     from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 18px)); }
     to   { opacity: 1; transform: none; }
@@ -768,7 +844,7 @@
   .tut-dots .dot.blank::after, .tut-book .dot.blank::after { font-size: calc(var(--tdot) * 0.5); }
   .tut-hole { position: relative; width: var(--tdot); height: var(--tdot); }
   .tut-hole .dot, .tut-hole .dot.blank { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .tut-hole[data-n]::before {      /* número da ordem do "?" (1, 2, 3...) */
+  .tut-hole[data-n]::before {
     content: attr(data-n);
     position: absolute;
     top: -6px;
@@ -863,7 +939,6 @@
   .tut-foot .restart-btn { flex: 1; padding: 10px 14px; font-size: 1.02rem; }
   .tut-foot .restart-btn:disabled { opacity: 0.35; cursor: default; transform: none; }
 
-  /* Sem movimento (ou com "reduzir movimento" ligado) o exemplo mostra o FINAL da história: a cor já no lugar. */
   .tut-tap .tut-hole .dot.blank { opacity: 0; }
   .tut-tap .tut-hole::after { content: "✨"; position: absolute; top: -18px; left: -10px; z-index: 2; font-size: 1.2rem; line-height: 1; }
   @media (prefers-reduced-motion: no-preference) {
@@ -876,7 +951,7 @@
   }
   @keyframes tutBlank  { 0%, 50% { opacity: 1; } 52%, 100% { opacity: 0; } }
   @keyframes tutFill   { 0%, 50% { opacity: 0; transform: scale(0.6); } 56% { opacity: 1; transform: scale(1.18); } 62%, 100% { opacity: 1; transform: scale(1); } }
-  @keyframes tutFinger {      /* o dedo chega, aperta a cor certa e some (sem passar por cima da legenda) */
+  @keyframes tutFinger {
     0%, 14% { opacity: 0; transform: translate(-35%, 14px); }
     30%     { opacity: 1; transform: translate(-35%, 0); }
     42%     { opacity: 1; transform: translate(-35%, -7px) scale(0.86); }
@@ -898,7 +973,6 @@
     justify-content: space-between;
     gap: 8px;
     font-size: 0.85rem;
-    /* --w = cor do mundo (nível de dificuldade) do padrão; --wbg = tom escuro dessa cor, para o fundo (vêm do JS, WORLDS) */
     background: var(--wbg, var(--card-alt));
     border: 2px solid var(--w, var(--border));
     border-radius: 12px;
@@ -931,7 +1005,6 @@
     line-height: 1.5;
   }
   .play-btn { font-size: 1.5rem; padding: 14px 54px; letter-spacing: 0.04em; }
-  /* O texto de apresentação tem 3 frases curtas, uma embaixo da outra (olhe → descubra → 4 mundos) */
   .start-screen p.start-text .st-line { display: block; }
   .start-screen p.start-text .st-line + .st-line { margin-top: 9px; }
   .start-hint { margin: 18px auto 0; max-width: 600px; color: var(--muted); font-weight: 600; font-size: 0.92rem; line-height: 1.35; }
@@ -1081,7 +1154,6 @@
     .play-btn { font-size: 1.25rem; padding: 10px 40px; }
     .start-hint { margin-top: 10px; font-size: 0.8rem; line-height: 1.3; }
 
-    /* Botão "Como jogar": menor e mais colado no canto */
     .help-fab {
       right: calc(14px + env(safe-area-inset-right, 0px));
       bottom: calc(14px + env(safe-area-inset-bottom, 0px));
@@ -1093,11 +1165,25 @@
     .help-fab:active { box-shadow: 0 1px 0 var(--sun-strong), 0 3px 8px rgba(0, 0, 0, 0.35); }
     html[data-screen="final"] body { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
 
-    /* Tutorial: folha quase do tamanho da tela, letras e figuras um pouco menores */
+    .mode-fab {
+      left: calc(14px + env(safe-area-inset-left, 0px));
+      top: calc(14px + env(safe-area-inset-top, 0px));
+      gap: 6px;
+      font-size: 0.9rem;
+      padding: 6px 7px 6px 10px;
+      box-shadow: 0 4px 0 #B8AC88, 0 8px 16px rgba(0, 0, 0, 0.35);
+    }
+    .mode-fab:active { box-shadow: 0 1px 0 #B8AC88, 0 3px 8px rgba(0, 0, 0, 0.35); }
+    html.animal-mode .mode-fab { box-shadow: 0 4px 0 var(--accent-strong), 0 8px 16px rgba(0, 0, 0, 0.35); }
+    html.animal-mode .mode-fab:active { box-shadow: 0 1px 0 var(--accent-strong), 0 3px 8px rgba(0, 0, 0, 0.35); }
+    .mode-switch { width: 38px; height: 22px; }
+    .mode-switch::after { width: 16px; height: 16px; font-size: 0.68rem; }
+    html.animal-mode .mode-switch::after { transform: translateX(16px); }
+
     .tut-modal { padding: calc(8px + env(safe-area-inset-top, 0px)) calc(8px + env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) calc(8px + env(safe-area-inset-left, 0px)); }
     .tut-sheet { border-width: 2px; border-radius: 20px; }
     .tut-close { top: 8px; right: 8px; width: 38px; height: 38px; }
-    .tut-head { padding: 11px 52px 2px 16px; min-height: 50px; }      /* a barrinha de passos fica abaixo do botão ✖ */
+    .tut-head { padding: 11px 52px 2px 16px; min-height: 50px; }
     .tut-title { font-size: 1.3rem; }
     .tut-level { font-size: 0.82rem; }
     .tut-segs { padding: 2px 16px 0; }
@@ -1113,7 +1199,6 @@
     .tut-foot .restart-btn { padding: 9px 10px; font-size: 0.95rem; }
   }
 
-  /* Telas bem estreitas (≈320 px): cabeçalho mais enxuto para caber o cronômetro com milésimos */
   @media (max-width: 380px) {
     .header-right { gap: 4px; }
     .pill { font-size: 0.78rem; padding: 3px 7px; }
@@ -1125,7 +1210,6 @@
     .restart-header-btn { font-size: 0.7rem; padding: 3px 7px; }
   }
 
-  /* Tutorial em telas baixas ou estreitas: a barrinha de passos já mostra onde você está, então a linha "Passo N" sai */
   @media (max-height: 600px) { .tut-step { display: none; } .tut-head { padding-top: 14px; } }
   @media (max-width: 340px) {
     .tut-title { font-size: 1.12rem; }
@@ -1138,10 +1222,11 @@
   @media (max-height: 460px) {
     .start-dots { display: none; }
     .final .mascot-row { display: none; }
-    .start-hint { display: none; }          /* o botão "Como jogar" já está à vista no canto */
-    /* Celular deitado: falta altura, sobra largura. O botão vira só o 📖 e ganha uma faixa livre na direita,
-       então o jogo não precisa encolher para sair da frente dele. */
-    body { padding-right: calc(62px + env(safe-area-inset-right, 0px)); }
+    .start-hint { display: none; }
+    body {
+      padding-right: calc(62px + env(safe-area-inset-right, 0px));
+      padding-left: calc(62px + env(safe-area-inset-left, 0px));
+    }
     .help-fab {
       right: calc(10px + env(safe-area-inset-right, 0px));
       bottom: calc(10px + env(safe-area-inset-bottom, 0px));
@@ -1152,6 +1237,34 @@
     }
     .help-fab .help-txt { display: none; }
     .help-fab .help-ico { font-size: 1.5rem; }
+    .mode-fab {
+      left: calc(10px + env(safe-area-inset-left, 0px));
+      top: calc(10px + env(safe-area-inset-top, 0px));
+      width: 44px; height: 44px;
+      padding: 0;
+      justify-content: center;
+      gap: 0;
+    }
+    .mode-fab .mode-txt, .mode-fab .mode-switch { display: none; }
+    .mode-fab .mode-ico { font-size: 1.5rem; }
+    html.animal-mode .mode-fab::after {
+      content: "✓";
+      position: absolute;
+      bottom: -4px;
+      right: -5px;
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-deep);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: 0 0 0 2px var(--accent);
+    }
     .tut-say { margin-bottom: 6px; }
     .tut-say .mascot { font-size: 1.7rem; }
     .tut-head { padding-top: 8px; }
@@ -1160,12 +1273,10 @@
     .tut-hole[data-n]::before { top: -5px; right: -5px; width: 16px; height: 16px; font-size: 0.64rem; }
   }
 
-  /* Telas de celular: na lista de tempos da tela final cabe só o número do padrão (ex.: "✅ 14  00:03.120") */
   @media (max-width: 560px) {
     .time-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .time-item { font-size: 0.8rem; gap: 4px; padding: 5px 8px; }
 
-    /* Botões finais lado a lado: mais juntinhos e com a letra acompanhando a largura da tela */
     .final-buttons { gap: 8px; max-width: none; }
     .final-buttons .restart-btn { padding: 10px 4px 12px; border-radius: 18px; font-size: min(0.95rem, 3.7vw); }
   }
@@ -1185,6 +1296,10 @@
   <div class="tray"><svg class="chalks" viewBox="0 0 330 24" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(-3 19 17)"><rect x="0" y="11" width="38" height="11" rx="4.5" fill="#FF4D4D"/><rect x="4" y="13.2" width="7" height="5" rx="2" fill="#fff" opacity="0.38"/></g><g transform="rotate(2.5 63 17)"><rect x="44" y="11" width="38" height="11" rx="4.5" fill="#FFD166"/><rect x="48" y="13.2" width="7" height="5" rx="2" fill="#fff" opacity="0.38"/></g><g transform="rotate(-3 107 17)"><rect x="88" y="11" width="38" height="11" rx="4.5" fill="#5BE37D"/><rect x="92" y="13.2" width="7" height="5" rx="2" fill="#fff" opacity="0.38"/></g><g transform="rotate(2.5 151 17)"><rect x="132" y="11" width="38" height="11" rx="4.5" fill="#4DC3FF"/><rect x="136" y="13.2" width="7" height="5" rx="2" fill="#fff" opacity="0.38"/></g><g transform="rotate(-3 195 17)"><rect x="176" y="11" width="38" height="11" rx="4.5" fill="#C58BFF"/><rect x="180" y="13.2" width="7" height="5" rx="2" fill="#fff" opacity="0.38"/></g><g transform="rotate(2.5 239 17)"><rect x="220" y="11" width="38" height="11" rx="4.5" fill="#F1EBD6"/><rect x="224" y="13.2" width="7" height="5" rx="2" fill="#fff" opacity="0.38"/></g><rect x="272" y="6" width="54" height="18" rx="3.5" fill="#3A3A3A"/><rect x="272" y="17" width="54" height="7" rx="3" fill="#C99A5B"/></svg></div>
 </div>
 
+<button class="mode-fab" id="mode-btn" type="button" role="switch" aria-checked="false" aria-label="Modo daltônico: as cores viram bichinhos">
+  <span class="mode-ico" aria-hidden="true">🐾</span><span class="mode-txt">Modo daltônico</span><span class="mode-switch" aria-hidden="true"></span>
+</button>
+
 <div class="wrap">
   <header>
     <h1 aria-label="Padrões de Cores"><span aria-hidden="true"><span class="l0">P</span><span class="l1">a</span><span class="l2">d</span><span class="l3">r</span><span class="l4">õ</span><span class="l0">e</span><span class="l1">s</span> <span class="l2">d</span><span class="l3">e</span> <span class="l4">C</span><span class="l0">o</span><span class="l1">r</span><span class="l2">e</span><span class="l3">s</span></span></h1>
@@ -1197,7 +1312,6 @@
   <div class="card" id="game-area"></div>
 </div>
 
-<!-- Botão fixo no canto inferior direito, em todas as telas: abre o tutorial (veja "Tutorial" no script) -->
 <button class="help-fab" id="help-btn" type="button" aria-haspopup="dialog" aria-label="Como jogar: abrir o tutorial">
   <span class="help-ico" aria-hidden="true">📖</span><span class="help-txt">Como jogar</span>
 </button>
@@ -1215,11 +1329,35 @@ const COLORS = {
 const BASE_COLOR_KEYS = ['red', 'blue', 'green', 'yellow'];
 const FULL_COLOR_KEYS = ['red', 'blue', 'green', 'yellow', 'pink', 'purple'];
 
+/* ---------------- Modo daltônico: cada cor vira um bichinho ----------------
+   Os bichinhos têm formas bem diferentes entre si, para dar para distinguir mesmo sem enxergar as cores.
+   Para trocar um bichinho, mude o emoji e o nome aqui (g: 'f' quando o nome é feminino: "a baleia"). */
+const ANIMALS = {
+  red:    { emoji: '🦀', name: 'Caranguejo', g: 'm' },
+  blue:   { emoji: '🐳', name: 'Baleia',     g: 'f' },
+  green:  { emoji: '🐢', name: 'Tartaruga',  g: 'f' },
+  yellow: { emoji: '🐝', name: 'Abelha',     g: 'f' },
+  pink:   { emoji: '🐷', name: 'Porquinho',  g: 'm' },
+  purple: { emoji: '🐙', name: 'Polvo',      g: 'm' }
+};
+
+const MODE_KEY = 'padroes-de-cores:modo';
+let animalMode = false;
+try { animalMode = localStorage.getItem(MODE_KEY) === 'bichos'; } catch (e) {}
+
+// Textos que mudam conforme o modo: M('texto com cores', 'texto com bichinhos')
+const M = (cores, bichos) => (animalMode ? bichos : cores);
+const itemName = k => (animalMode ? ANIMALS[k].name : COLORS[k].name);
+const nm = k => itemName(k).toLowerCase();
+const fem = k => animalMode && ANIMALS[k].g === 'f';
+const oA = k => (fem(k) ? 'a' : 'o');      // o verde · a tartaruga
+const doA = k => (fem(k) ? 'da' : 'do');   // do azul · da baleia
+const noA = k => (fem(k) ? 'na' : 'no');   // no verde · na tartaruga
+const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
+
 const TOTAL_ROUNDS = 20;
 const ROUNDS_PER_WORLD = 5;
 
-// Um "mundo" a cada 5 padrões: é aqui que a dificuldade sobe.
-// color = cor do mundo (barra de progresso, borda e número na tabela de tempos); tint = tom escuro da mesma cor, usado de fundo na tabela.
 const WORLDS = [
   { emoji: '🌱', name: 'Mundo Verde',    color: '#5BE37D', tint: '#1F5B2E' },
   { emoji: '🚀', name: 'Mundo Aventura', color: '#4DC3FF', tint: '#1F475B' },
@@ -1227,12 +1365,6 @@ const WORLDS = [
   { emoji: '👑', name: 'Mundo Campeão',  color: '#FFD166', tint: '#5B491F' }
 ];
 
-// As 4 dificuldades, uma por mundo (na mesma ordem de WORLDS). O tutorial ("Como jogar") lê estes mesmos números,
-// então para mudar a dificuldade basta mexer aqui.
-//   colors   = quantas cores diferentes se repetem        blanks  = quantos "?" ficam escondidos
-//   anywhere = os "?" podem ficar em qualquer lugar (false = sempre no final)
-//   options  = quantas cores aparecem para tocar          repeats = quantas vezes o grupo de cores se repete
-//   extra    = bolinhas a mais depois das repetições (a partir do padrão 6: linhas "quebradas", sem cores iguais uma embaixo da outra)
 const LEVELS = [
   { label: 'Fácil',         colors: 2, blanks: 1, anywhere: false, options: 4, repeats: 6, extra: 0, pool: BASE_COLOR_KEYS },
   { label: 'Médio',         colors: 3, blanks: 2, anywhere: false, options: 4, repeats: 4, extra: 1, pool: BASE_COLOR_KEYS },
@@ -1241,11 +1373,11 @@ const LEVELS = [
 ];
 
 const PROMPTS = [
-  'Qual cor vem agora? 🤔',
-  'Descubra o padrão! 🔍',
-  'Olhe bem as cores! 👀',
-  'Você consegue! 💪',
-  'Quais cores faltam? 🧩'
+  ['Qual cor vem agora? 🤔', 'Qual bichinho vem agora? 🤔'],
+  ['Descubra o padrão! 🔍',  'Descubra o padrão! 🔍'],
+  ['Olhe bem as cores! 👀',  'Olhe bem os bichinhos! 👀'],
+  ['Você consegue! 💪',       'Você consegue! 💪'],
+  ['Quais cores faltam? 🧩', 'Quais bichinhos faltam? 🧩']
 ];
 const CORRECT_MSGS = [
   'Isso aí! Você acertou! 🎉',
@@ -1257,7 +1389,7 @@ const CORRECT_MSGS = [
 // Mascote: a Luna, a corujinha
 const LUNA_SRC = 'data:image/webp;base64,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';
 const LUNA_IMG = '<img class="luna-img" src="' + LUNA_SRC + '" alt="Luna, a corujinha" draggable="false">';
-const MASCOT = LUNA_IMG;   // HTML da Luna (imagem)
+const MASCOT = LUNA_IMG;
 
 const CONFETTI_COLORS = ['#FF6B6B', '#FFD166', '#5BE37D', '#4DC3FF', '#C58BFF', '#FF9F1C'];
 
@@ -1273,9 +1405,9 @@ let roundFinished = false;
 let timerInterval = null;
 let gameStartTime = null;
 let lastSplitTime = null;
-let timerPausedAt = null;   // quando o tutorial parou o relógio (null = não está parado)
+let timerPausedAt = null;
 let roundTimes = [];
-let roundResults = [];   // true/false: cada padrão foi acertado por completo?
+let roundResults = [];
 
 function shuffle(arr) {
   const a = [...arr];
@@ -1300,14 +1432,13 @@ const COMPACT_MQ = '(max-width: 560px), (max-height: 700px)';
 
 function setScreen(name) {
   document.documentElement.setAttribute('data-screen', name);
+  document.body.style.paddingTop = '';
 }
 
 function viewportHeight() {
   return Math.round((window.visualViewport && window.visualViewport.height) || window.innerHeight || 0);
 }
 
-// Escolhe em quantas linhas dividir o padrão e o tamanho das bolinhas,
-// para ele caber na largura E numa fração da altura da tela.
 function computePatternLayout(n, W, vh, compact) {
   const maxDot = compact ? 54 : 64;
   const gap = Math.max(5, Math.min(12, Math.round(W * 0.02)));
@@ -1325,7 +1456,6 @@ function computePatternLayout(n, W, vh, compact) {
   return { rows: 3, cols: Math.ceil(n / 3), size: 18, gap, height: 0 };
 }
 
-// Os botões de cor ficam sempre numa linha só, do maior tamanho que couber.
 function computeOptionLayout(m, W, vh, compact) {
   const gap = Math.max(6, Math.min(18, Math.round(W * 0.035)));
   const maxOpt = compact ? 64 : 70;
@@ -1333,7 +1463,6 @@ function computeOptionLayout(m, W, vh, compact) {
   return { size, gap };
 }
 
-// Rede de segurança: se mesmo assim o conteúdo for maior que a tela, reduz tudo proporcionalmente.
 function computeFitScale(avail, natural) {
   if (!natural || !avail || avail <= 0) return 1;
   return Math.max(0.4, Math.min(1, avail / natural));
@@ -1362,7 +1491,6 @@ function layoutPlay() {
   scheduleFit();
 }
 
-// Topo do botão "Como jogar" (y na tela), mas só se ele ficar na frente do jogo (na horizontal). Senão, Infinity.
 function helpButtonTop(wrap) {
   const fab = document.getElementById('help-btn');
   if (!fab) return Infinity;
@@ -1371,27 +1499,55 @@ function helpButtonTop(wrap) {
   return f.top - 8;
 }
 
+// Onde o jogo precisa começar para não ficar atrás do botão "Modo daltônico" (só quando eles se cruzam na largura).
+function modeButtonBottom(wrap) {
+  const btn = document.getElementById('mode-btn');
+  if (!btn) return -Infinity;
+  const b = btn.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+  if (!b.width || b.right + 8 <= w.left || b.left - 8 >= w.right) return -Infinity;
+  return b.bottom + 8;
+}
+
+// Tela final (que rola): abre espaço no topo se o título ficaria atrás do botão "Modo daltônico".
+function clearModeButton(wrap) {
+  for (let i = 0; i < 3; i++) {
+    const need = Math.ceil(modeButtonBottom(wrap) - wrap.getBoundingClientRect().top);
+    if (!(need > 0)) return;
+    const pt = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
+    document.body.style.paddingTop = (pt + need) + 'px';
+  }
+}
+
 function fitToViewport() {
   const wrap = document.querySelector('.wrap');
   if (!wrap) return;
   wrap.style.transform = '';
   wrap.style.marginTop = '';
+  document.body.style.paddingTop = '';
   const screen = document.documentElement.getAttribute('data-screen');
-  if (screen !== 'play' && screen !== 'start') return;     // resultados: a página pode rolar
+  if (screen === 'final') { clearModeButton(wrap); return; }
+  if (screen !== 'play' && screen !== 'start') return;
 
   const cs = getComputedStyle(document.body);
-  // O botão "Como jogar" fica fixo no canto de baixo: se ele estiver na frente do jogo, o jogo termina um pouco acima dele
+  const padTop = parseFloat(cs.paddingTop);
   const bottom = Math.min(viewportHeight() - parseFloat(cs.paddingBottom), helpButtonTop(wrap));
-  const avail = bottom - parseFloat(cs.paddingTop);
   const natural = wrap.offsetHeight;
-  if (!natural || avail <= 0) return;
+  if (!natural || bottom - padTop <= 0) return;
 
-  const f = computeFitScale(avail, natural);
-  if (f < 1) {
+  // Centraliza na altura livre; se o topo cair atrás do botão "Modo daltônico", começa logo abaixo dele.
+  const place = top => {
+    const f = computeFitScale(bottom - top, natural);
+    return { f, y: top + Math.max(0, (bottom - top - natural * f) / 2) };
+  };
+  let p = place(padTop);
+  const clear = modeButtonBottom(wrap);
+  if (p.y < clear && bottom - clear > 0) p = place(clear);
+
+  if (p.f < 1) {
     wrap.style.transformOrigin = 'top center';
-    wrap.style.transform = `scale(${f.toFixed(3)})`;
+    wrap.style.transform = `scale(${p.f.toFixed(3)})`;
   }
-  wrap.style.marginTop = Math.max(0, Math.round((avail - natural * f) / 2)) + 'px';   // centraliza na vertical
+  wrap.style.marginTop = Math.round(p.y - padTop) + 'px';
 }
 
 let fitFrame = null;
@@ -1400,12 +1556,10 @@ function scheduleFit() {
   fitFrame = requestAnimationFrame(() => { fitFrame = null; fitToViewport(); });
 }
 
-// A moldura de madeira e os enfeites da lousa precisam cobrir EXATAMENTE a área visível. Em alguns celulares
-// as barras do navegador somem ao rolar a página e a moldura ficava mais curta que a tela.
 let lastFrameH = 0;
 function syncFrameHeight() {
   const vv = window.visualViewport;
-  if (vv && vv.scale > 1.01) return;                  // com zoom de pinça, deixa como está
+  if (vv && vv.scale > 1.01) return;
   const h = viewportHeight();
   if (!h || h === lastFrameH) return;
   lastFrameH = h;
@@ -1421,13 +1575,12 @@ function onViewportChange() {
 window.addEventListener('resize', onViewportChange);
 window.addEventListener('orientationchange', () => setTimeout(onViewportChange, 150));
 if (window.visualViewport) window.visualViewport.addEventListener('resize', onViewportChange);
-window.addEventListener('scroll', syncFrameHeight, { passive: true });   // as barras do navegador mudam enquanto rola
+window.addEventListener('scroll', syncFrameHeight, { passive: true });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(onViewportChange);
 syncFrameHeight();
 
 /* ---------------- Cronômetro (contínuo) ---------------- */
 
-// Formato do tempo: minutos:segundos.milésimos  (ex.: 01:23.456)
 function formatTime(seconds) {
   const total = Math.max(0, Math.round((seconds || 0) * 1000));
   const min = Math.floor(total / 60000);
@@ -1440,7 +1593,7 @@ function runTimerInterval() {
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     updateTimerDisplay((Date.now() - gameStartTime) / 1000);
-  }, 40);   // atualiza ~25 vezes por segundo para os milésimos correrem de forma fluida
+  }, 40);
 }
 
 function startGameTimer() {
@@ -1457,10 +1610,8 @@ function stopGameTimer() {
   timerPausedAt = null;
 }
 
-// Tutorial aberto no meio do jogo: o relógio para. O tempo parado não conta, nem no total nem no padrão da vez
-// (na volta, os dois relógios andam para frente o mesmo tanto que ficaram parados).
 function pauseGameClock() {
-  if (timerInterval === null || timerPausedAt !== null) return;      // não tem jogo correndo
+  if (timerInterval === null || timerPausedAt !== null) return;
   timerPausedAt = Date.now();
   clearInterval(timerInterval);
   timerInterval = null;
@@ -1489,13 +1640,6 @@ function updateTimerDisplay(seconds) {
 
 /* ---------------- Geração dos padrões ---------------- */
 
-// Gera um padrão cíclico. Se randomPosition=false, os espaços ficam sempre
-// no final da sequência. Se true, o bloco de espaços pode aparecer em
-// qualquer posição (início, meio ou fim), tornando o padrão mais difícil
-// de deduzir só olhando o começo.
-// extraDots = bolinhas a mais além das repetições completas. Com o padrão dividido em linhas, o tamanho da
-// linha de cima deixa de ser múltiplo do ciclo, e a mesma cor não fica mais uma embaixo da outra
-// (era só olhar pra cima e copiar a cor: fácil demais).
 function generatePattern(numColors, numBlanks, pool, randomPosition, repeats, optionCount, extraDots = 0) {
   const palette = pickColors(numColors, pool);
   const cycle = shuffle(palette);
@@ -1518,9 +1662,6 @@ function generatePattern(numColors, numBlanks, pool, randomPosition, repeats, op
   const answers = sequence.slice(blankStart, blankStart + numBlanks);
   const visibleAfter = sequence.slice(blankStart + numBlanks);
 
-  // As opções sempre incluem as cores realmente usadas no padrão (senão
-  // ficaria impossível responder), completando com cores extras do pool
-  // até atingir optionCount, pra servir de distração.
   let optionColors = [...palette];
   const extras = shuffle(pool.filter(c => !palette.includes(c)));
   while (optionColors.length < optionCount && extras.length) {
@@ -1531,11 +1672,6 @@ function generatePattern(numColors, numBlanks, pool, randomPosition, repeats, op
   return { visibleBefore, visibleAfter, answers, numBlanks, optionColors };
 }
 
-// Os números de cada dificuldade ficam em LEVELS (lá em cima):
-//   Padrões 1–5:   1 espaço,  2 cores, sempre no final,      4 opções (12 bolinhas)
-//   Padrões 6–10:  2 espaços, 3 cores, sempre no final,      4 opções (13 bolinhas)
-//   Padrões 11–15: 3 espaços, 4 cores (com rosa/roxo), posição aleatória, 5 opções (13 bolinhas)
-//   Padrões 16–20: 4 espaços, 5 cores (com rosa/roxo), posição aleatória, 5 opções (16 bolinhas)
 function buildRounds() {
   rounds = [];
   LEVELS.forEach(lv => {
@@ -1580,7 +1716,6 @@ function renderProgress() {
       <div class="world-sub">Padrão ${currentRound + 1} de ${TOTAL_ROUNDS} · Complete ${blanks} ${blanks === 1 ? 'espaço' : 'espaços'}</div>
     </div>
   `;
-  // reinicia a animação de entrada só quando muda de mundo
   banner.style.animation = 'none';
   void banner.offsetWidth;
   banner.style.animation = '';
@@ -1615,7 +1750,20 @@ function renderProgressBar(current, allDone) {
 
 /* ---------------- Mascote ---------------- */
 
+let shownPrompt = -1;
+
+function promptText(i) {
+  return M(PROMPTS[i][0], PROMPTS[i][1]);
+}
+
+function showPrompt(i) {
+  if (i === undefined) i = Math.floor(Math.random() * PROMPTS.length);
+  setMascot(promptText(i), '');
+  shownPrompt = i;
+}
+
 function setMascot(text, mood) {
+  shownPrompt = -1;
   const bubble = document.getElementById('mascot-text');
   const mascot = document.getElementById('mascot');
   if (!bubble || !mascot) return;
@@ -1653,20 +1801,16 @@ function launchConfetti(count) {
   setTimeout(() => root.remove(), 3600);
 }
 
-// Faixa de acertos (de 5 em 5): 0 = 0–5, 1 = 6–10, 2 = 11–15, 3 = 16–20
 function finalTierOf(s) {
   const step = TOTAL_ROUNDS / 4;
   return s <= 0 ? 0 : Math.min(3, Math.ceil(s / step) - 1);
 }
 
-// Estrelas da tela final (e da imagem de compartilhar): uma por faixa, e são 4 faixas, então são 4 estrelas.
-// 1–5 acertos = 1 estrela, 6–10 = 2, 11–15 = 3, 16–20 = 4 (nenhum acerto = nenhuma).
 const FINAL_STARS = 4;
 function starsOf(s) {
   return s <= 0 ? 0 : finalTierOf(s) + 1;
 }
 
-// Animação da tela final, diferente para cada faixa de acertos
 function launchFinalAnimation(s) {
   clearEffects();
   if (prefersReducedMotion()) return;
@@ -1737,10 +1881,89 @@ function launchFinalAnimation(s) {
 
 /* ---------------- Rodada ---------------- */
 
-// Pinta o miolo colorido de uma bolinha dentro de um <canvas> (a cor vem do CSS: --red, --blue...).
-// Por quê: o "modo escuro forçado" de alguns navegadores (Samsung Internet, por exemplo) escurece as cores de
-// fundo do CSS e deixa o amarelo marrom, o verde escuro... Mas ele não mexe no conteúdo de um <canvas>.
-// Se o canvas não existir ou falhar, a bolinha continua com a cor do CSS por baixo.
+/* Modo daltônico: cada bichinho é desenhado uma vez numa "fichinha" (canvas) e depois copiado para as bolinhas.
+   Como fica num canvas, igual às cores, extensões de modo escuro e o alto contraste do sistema não estragam o desenho. */
+const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", "EmojiOne Color", "Android Emoji", sans-serif';
+const animalArtCache = {};
+
+function colorKeyOf(el) {
+  for (const k in COLORS) if (el.classList.contains(COLORS[k].class)) return k;
+  return null;
+}
+
+// Desenha o emoji grande num rascunho e mede a parte visível (cada aparelho desenha os emojis de um jeito).
+function emojiSprite(emoji) {
+  const S = 256, F = 160;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = S;
+  const ctx = cv.getContext('2d');
+  let box = null;
+  if (ctx) {
+    ctx.font = `${F}px ${EMOJI_FONT}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, S / 2, S / 2);
+    try {
+      const px = ctx.getImageData(0, 0, S, S).data;
+      let x0 = S, y0 = S, x1 = -1, y1 = -1;
+      for (let y = 0; y < S; y++) {
+        for (let x = 0; x < S; x++) {
+          if (px[(y * S + x) * 4 + 3] > 24) {
+            if (x < x0) x0 = x;
+            if (x > x1) x1 = x;
+            if (y < y0) y0 = y;
+            if (y > y1) y1 = y;
+          }
+        }
+      }
+      if (x1 > x0 && y1 > y0 && x1 - x0 < S - 4 && y1 - y0 < S - 4) {
+        box = { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+        // raio do desenho a partir do centro: assim o bichinho fica o maior possível sem encostar na borda redonda
+        const cx = x0 + box.w / 2, cy = y0 + box.h / 2;
+        let r2 = 0;
+        for (let y = y0; y <= y1; y++) {
+          for (let x = x0; x <= x1; x++) {
+            if (px[(y * S + x) * 4 + 3] > 24) {
+              const d = (x + 0.5 - cx) * (x + 0.5 - cx) + (y + 0.5 - cy) * (y + 0.5 - cy);
+              if (d > r2) r2 = d;
+            }
+          }
+        }
+        box.r = Math.sqrt(r2);
+      }
+    } catch (e) {}
+  }
+  if (!box) box = { x: (S - F) / 2, y: (S - F) / 2, w: F, h: F };
+  if (!box.r) box.r = Math.hypot(box.w, box.h) * 0.4;
+  return { cv, box };
+}
+
+function animalArt(k) {
+  const R = Math.round(Math.min(3, Math.max(1, window.devicePixelRatio || 1)) * 72);
+  const cached = animalArtCache[k];
+  if (cached && cached.width === R) return cached;
+
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = R;
+  const ctx = cv.getContext('2d');
+  if (!ctx) return cv;
+  const g = ctx.createRadialGradient(R * 0.4, R * 0.34, R * 0.04, R * 0.5, R * 0.5, R * 0.7);
+  g.addColorStop(0, '#FFFFFF');
+  g.addColorStop(1, '#F1E8D0');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, R, R);
+
+  const sp = emojiSprite(ANIMALS[k].emoji);
+  const fit = Math.min((R * 0.42) / sp.box.r, (R * 0.8) / Math.max(sp.box.w, sp.box.h));
+  const w = sp.box.w * fit, h = sp.box.h * fit;
+  ctx.imageSmoothingEnabled = true;
+  if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(sp.cv, sp.box.x, sp.box.y, sp.box.w, sp.box.h, (R - w) / 2, (R - h) / 2, w, h);
+
+  animalArtCache[k] = cv;
+  return cv;
+}
+
 function paintSwatch(el) {
   let cv = el.querySelector('canvas.swatch');
   if (!cv) {
@@ -1752,6 +1975,19 @@ function paintSwatch(el) {
   }
   const ctx = cv.getContext && cv.getContext('2d');
   if (!ctx) return;
+
+  const animal = animalMode ? colorKeyOf(el) : null;
+  if (animal) {
+    const art = animalArt(animal);
+    if (cv.width !== art.width) cv.width = cv.height = art.width;
+    cv.classList.add('art');
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(art, 0, 0);
+    return;
+  }
+
+  if (cv.width !== 2) cv.width = cv.height = 2;
+  cv.classList.remove('art');
   ctx.fillStyle = getComputedStyle(el).backgroundColor;
   ctx.fillRect(0, 0, 2, 2);
 }
@@ -1761,8 +1997,12 @@ function clearSwatch(el) {
   if (cv) cv.remove();
 }
 
+function optionsLabelText() {
+  return M('Toque nas cores, na ordem certa 👇', 'Toque nos bichinhos, na ordem certa 👇');
+}
+
 function renderRound() {
-  clearEffects();   // o confete do acerto anterior não pode cobrir o próximo padrão (o tempo está correndo)
+  clearEffects();
   setScreen('play');
   renderHeaderGame();
 
@@ -1780,7 +2020,7 @@ function renderRound() {
       <div class="bubble" id="mascot-text"></div>
     </div>
     <div class="pattern-row" id="pattern-row"></div>
-    <p class="options-label">Toque nas cores, na ordem certa 👇</p>
+    <p class="options-label" id="options-label">${optionsLabelText()}</p>
     <div class="options-row" id="options-row"></div>
     <div class="answer-reveal" id="answer-reveal"></div>
     <div class="controls">
@@ -1817,8 +2057,8 @@ function renderRound() {
   round.optionColors.forEach(color => {
     const btn = document.createElement('button');
     btn.className = `option ${COLORS[color].class}`;
-    btn.setAttribute('aria-label', COLORS[color].name);
-    btn.title = COLORS[color].name;
+    btn.setAttribute('aria-label', itemName(color));
+    btn.title = itemName(color);
     btn.addEventListener('click', () => handlePick(color));
     optionsRow.appendChild(btn);
     paintSwatch(btn);
@@ -1829,12 +2069,11 @@ function renderRound() {
 
   renderProgress();
 
-  // Mensagem do mascote: boas-vindas ao entrar num mundo novo, dicas nas demais
   if (currentRound % ROUNDS_PER_WORLD === 0) {
     const w = WORLDS[worldIndexOf(currentRound)];
     setMascot(`Bem-vindo ao ${w.name}! ${w.emoji}`, '');
   } else {
-    setMascot(pickRandom(PROMPTS), '');
+    showPrompt();
   }
 
   layoutPlay();
@@ -1875,7 +2114,7 @@ function clearRound() {
 
   document.getElementById('clear-btn').classList.add('hidden');
   document.getElementById('answer-reveal').innerHTML = '';
-  setMascot(pickRandom(PROMPTS), '');
+  showPrompt();
   scheduleFit();
 }
 
@@ -2057,7 +2296,7 @@ async function copyText(text) {
       await navigator.clipboard.writeText(text);
       return true;
     }
-  } catch (e) { /* tenta o método antigo abaixo */ }
+  } catch (e) {}
   try {
     const ta = document.createElement('textarea');
     ta.value = text;
@@ -2089,7 +2328,6 @@ function showToast(msg) {
   showToast.timer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// Plano B (se a imagem não puder ser criada): compartilha só o texto.
 async function shareTextOnly() {
   const text = buildShareText();
   if (navigator.share) {
@@ -2097,7 +2335,7 @@ async function shareTextOnly() {
       await navigator.share({ title: 'Meu resultado — Padrões de Cores', text });
       return;
     } catch (e) {
-      if (e && e.name === 'AbortError') return;   // a pessoa fechou a janela de compartilhar
+      if (e && e.name === 'AbortError') return;
     }
   }
   const ok = await copyText(text);
@@ -2136,7 +2374,6 @@ function shStar(ctx, cx, cy, r) {
   ctx.closePath();
 }
 
-// Diminui a fonte até o texto caber na largura máxima
 function shFitText(ctx, text, weight, maxPx, maxW) {
   let px = maxPx;
   ctx.font = shFont(weight, px);
@@ -2155,7 +2392,6 @@ function shWrap(ctx, text, maxW) {
   return lines;
 }
 
-// Rabiscos de giz do fundo (os mesmos "tipos" de desenho da lousa do jogo)
 function shDoodle(ctx, kind, x, y, s) {
   ctx.save();
   ctx.translate(x, y);
@@ -2327,7 +2563,7 @@ function shTimes(ctx, avgTime) {
   const x0 = (SHARE_W - total) / 2, y0 = 992;
   for (let i = 0; i < TOTAL_ROUNDS; i++) {
     const x = x0 + (i % cols) * (cw + gap), y = y0 + Math.floor(i / cols) * (ch + rowGap);
-    const mundo = WORLDS[worldIndexOf(i)], cor = mundo.color;   // cor do mundo (nível de dificuldade) deste padrão
+    const mundo = WORLDS[worldIndexOf(i)], cor = mundo.color;
     ctx.fillStyle = mundo.tint; shRound(ctx, x, y, cw, ch, 16); ctx.fill();
     ctx.lineWidth = 3; ctx.strokeStyle = cor; shRound(ctx, x, y, cw, ch, 16); ctx.stroke();
     ctx.textBaseline = 'middle';
@@ -2341,15 +2577,21 @@ function shTimes(ctx, avgTime) {
   ctx.textBaseline = 'alphabetic';
 }
 
-// Um "padrão" de bolinhas com a última escondida, como no jogo
 function shPatternRow(ctx) {
+  const keys = ['red', 'yellow', 'green', 'blue', 'purple'];
   const cols = ['#FF0000', '#FFEA00', '#26FF00', '#0044FF', '#8C00FF'];
   const cy = 1452, step = 92, r = 32;
   for (let i = 0; i < 8; i++) {
     const cx = SHARE_W / 2 + (i - 3.5) * step;
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
     if (i < 7) {
-      ctx.fillStyle = cols[i % cols.length]; ctx.fill();
+      if (animalMode) {
+        ctx.save(); ctx.clip();
+        ctx.drawImage(animalArt(keys[i % keys.length]), cx - r, cy - r, 2 * r, 2 * r);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = cols[i % cols.length]; ctx.fill();
+      }
       ctx.lineWidth = 5; ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
     } else {
       ctx.fillStyle = '#2B5448'; ctx.fill();
@@ -2380,7 +2622,7 @@ async function buildShareImage() {
         new Promise(r => setTimeout(r, 1500))
       ]);
     }
-  } catch (e) { /* segue com a fonte reserva */ }
+  } catch (e) {}
 
   const canvas = document.createElement('canvas');
   canvas.width = SHARE_W;
@@ -2482,7 +2724,7 @@ function openShareModal(blob) {
     try {
       await navigator.share({ files: [file], title: 'Meu resultado — Padrões de Cores', text: buildShareCaption() });
     } catch (e) {
-      if (e && e.name === 'AbortError') return;       // a pessoa fechou o menu de compartilhar
+      if (e && e.name === 'AbortError') return;
       downloadImage(blob);
       showToast('Imagem salva! Agora é só enviar para alguém 📸');
     }
@@ -2490,7 +2732,6 @@ function openShareModal(blob) {
   m.querySelector('#share-close').focus();
 }
 
-// Botão "Compartilhar seu resultado": cria a imagem e mostra para a pessoa enviar ou baixar.
 async function shareResult() {
   const btn = document.getElementById('share-btn');
   if (btn) btn.disabled = true;
@@ -2509,12 +2750,12 @@ async function shareResult() {
    Os padrões que faltam são preenchidos com acertos/tempos aleatórios, só para visualizar.
    Para remover: apague este bloco inteiro (até a linha "FIM DO ATALHO"). */
 const DEV_EGG_CLICKS = 5;
-const DEV_EGG_WINDOW_MS = 2000;     // tempo máximo entre um clique e o seguinte
+const DEV_EGG_WINDOW_MS = 2000;
 let devEggCount = 0;
 let devEggLast = 0;
 
 function devJumpToFinal() {
-  const hitRate = Math.random();      // sorteado a cada salto, para qualquer faixa de animação poder aparecer
+  const hitRate = Math.random();
   for (let i = 0; i < TOTAL_ROUNDS; i++) {
     if (roundTimes[i] === undefined) {
       roundTimes[i] = 1.5 + Math.random() * 7.5;
@@ -2528,7 +2769,7 @@ function devJumpToFinal() {
 
 document.addEventListener('click', (e) => {
   if (document.documentElement.getAttribute('data-screen') !== 'play') { devEggCount = 0; return; }
-  if (!e.target.closest || !e.target.closest('#mascot')) { devEggCount = 0; return; }   // tem que ser seguido
+  if (!e.target.closest || !e.target.closest('#mascot')) { devEggCount = 0; return; }
   const now = Date.now();
   devEggCount = (now - devEggLast <= DEV_EGG_WINDOW_MS) ? devEggCount + 1 : 1;
   devEggLast = now;
@@ -2544,30 +2785,27 @@ document.addEventListener('click', (e) => {
    o que é um padrão, como tocar, como ler, as 4 dificuldades (os números vêm de LEVELS) e relógio/estrelas.
    Para mudar um texto, procure a página em tutPages(). Os exemplos desenhados ficam em TUT_DEMO_*. */
 
-// cycle = o grupo de cores que se repete · total = quantas bolinhas · from/count = onde ficam os "?" escondidos
-// (as respostas saem da própria sequência, então o exemplo nunca fica errado)
 const TUT_DEMO_PATTERN   = { cycle: ['blue', 'green'], total: 6 };
 const TUT_DEMO_PATTERN_3 = { cycle: ['red', 'yellow', 'blue'], total: 6 };
 const TUT_DEMO_TAP     = { cycle: ['blue', 'green'], total: 6, from: 5, count: 1 };
 const TUT_DEMO_BOOK    = { cycle: ['blue', 'yellow', 'red'], total: 9, from: 7, count: 2 };
 const TUT_DEMO_WORLDS  = [
-  { cycle: ['yellow', 'red'],                            total: 8,  from: 7, count: 1 },   // Mundo Verde
-  { cycle: ['red', 'green', 'blue'],                     total: 10, from: 8, count: 2 },   // Mundo Aventura
-  { cycle: ['purple', 'green', 'red', 'pink'],           total: 12, from: 4, count: 3 },   // Mundo Mágico
-  { cycle: ['blue', 'yellow', 'red', 'green', 'purple'], total: 13, from: 5, count: 4 }    // Mundo Campeão
+  { cycle: ['yellow', 'red'],                            total: 8,  from: 7, count: 1 },
+  { cycle: ['red', 'green', 'blue'],                     total: 10, from: 8, count: 2 },
+  { cycle: ['purple', 'green', 'red', 'pink'],           total: 12, from: 4, count: 3 },
+  { cycle: ['blue', 'yellow', 'red', 'green', 'purple'], total: 13, from: 5, count: 4 }
 ];
 
 let tutorialIndex = 0;
-let tutorialWidth = 0;      // largura usada para desenhar a página (se mudar, desenha de novo)
+let tutorialWidth = 0;
 let tutorialTouch = null;
 
-const tutMaxDot = () => (viewportHeight() <= 460 ? 30 : 42);     // tamanho máximo das bolinhas dos exemplos
+const tutMaxDot = () => (viewportHeight() <= 460 ? 30 : 42);
 const tutSeq = d => Array.from({ length: d.total }, (_, i) => d.cycle[i % d.cycle.length]);
 const tutDot = k => `<div class="dot ${COLORS[k].class}"></div>`;
 
-// Quantas linhas e que tamanho de bolinha cabem na largura W: poucas linhas e bolinhas grandes, sem passar de 3 linhas
 function tutLayout(n, W) {
-  const low = viewportHeight() <= 460;           // celular deitado: bolinhas menores para sobrar espaço na altura
+  const low = viewportHeight() <= 460;
   const gap = W < 260 ? 5 : 6, maxDot = low ? 30 : 42, nice = low ? 26 : 34;
   const opts = [1, 2, 3].map(rows => {
     const cols = Math.ceil(n / rows);
@@ -2579,7 +2817,6 @@ function tutLayout(n, W) {
   return two.size >= 24 ? two : opts[2];
 }
 
-// A sequência do exemplo, com os "?" no lugar certo. fill = cor que preenche o "?" (só no exemplo animado do toque)
 function tutPattern(d, W, fill) {
   const L = tutLayout(d.total, W);
   let n = 0;
@@ -2597,17 +2834,22 @@ function tutPattern(d, W, fill) {
 const tutLine = (label, keys) =>
   `<div class="tut-line"><span>${label}</span><span class="tut-line-dots">${keys.map(tutDot).join('')}</span></div>`;
 
-// As páginas. say = o que a Luna fala · stage(W) = o desenho · cap = legenda embaixo · tip = dica · world = índice do mundo
 function tutPages() {
   const qm = n => (n === 1 ? '1 “?”' : `${n} “?”`);
+  const coisas = n => `${n} ${M('cores', 'bichinhos')}`;
   const pages = [];
+
+  // Os nomes nos textos saem dos próprios exemplos, então mudam junto com o modo (cores ou bichinhos)
+  const demoPair = TUT_DEMO_PATTERN.cycle.map(nm).join(', ');
+  const tapSeq = tutSeq(TUT_DEMO_TAP);
+  const tapAns = tapSeq[TUT_DEMO_TAP.from], tapPrev = tapSeq[TUT_DEMO_TAP.from - 1];
+  const novos = FULL_COLOR_KEYS.filter(k => !BASE_COLOR_KEYS.includes(k));
 
   pages.push({
     title: 'O que é um padrão?',
-    say: 'Oi! Eu sou a Luna e vou te ensinar a jogar! 🦉 Padrão é quando as cores se repetem, sempre na mesma ordem.',
+    say: `Oi! Eu sou a Luna e vou te ensinar a jogar! 🦉 Padrão é quando ${M('as cores', 'os bichinhos')} se repetem, sempre na mesma ordem.`,
     stage: W => {
       const gap = 6;
-      // Dois exemplos, cada um numa linha só: um grupo de 2 cores e um grupo de 3 cores (o grupo é o que se repete)
       const group = d => {
         const size = Math.max(16, Math.min(tutMaxDot(), Math.floor((W - (d.total - 1) * gap) / d.total)));
         const len = d.cycle.length, times = d.total / len;
@@ -2618,26 +2860,29 @@ function tutPages() {
       };
       return group(TUT_DEMO_PATTERN) + group(TUT_DEMO_PATTERN_3);
     },
-    cap: 'Azul, verde… azul, verde… O grupo volta sempre igual. Ele pode ter 2 cores, 3 cores ou até mais!'
+    cap: `${capFirst(demoPair)}… ${demoPair}… O grupo volta sempre igual. Ele pode ter ${M('2 cores, 3 cores', '2 bichinhos, 3 bichinhos')} ou até mais!`,
+    tip: M('🐾 Confunde algumas cores? Ligue o Modo daltônico, lá em cima, à esquerda: as cores viram bichinhos!',
+           '🎨 Quer as cores de volta? É só desligar o Modo daltônico, lá em cima, à esquerda.')
   });
 
   pages.push({
-    title: 'Descubra a cor escondida',
-    say: 'Algumas bolinhas ficam escondidas atrás de um “?”. Veja o que se repete, descubra qual cor falta e toque nela.',
+    title: M('Descubra a cor escondida', 'Descubra o bichinho escondido'),
+    say: M('Algumas bolinhas ficam escondidas atrás de um “?”. Veja o que se repete, descubra qual cor falta e toque nela.',
+           'Alguns bichinhos ficam escondidos atrás de um “?”. Veja o que se repete, descubra qual bichinho falta e toque nele.'),
     stageClass: 'tut-tap',
     stage: W => {
       const od = Math.min(viewportHeight() <= 460 ? 40 : 52, Math.floor((W - 3 * 12) / 4));
-      const opts = ['red', 'green', 'yellow', 'blue'].map(k => k === 'green'
+      const opts = ['red', 'green', 'yellow', 'blue'].map(k => k === tapAns
         ? `<div class="tut-pick">${tutDot(k)}<span class="tut-finger" aria-hidden="true">👆</span></div>`
         : tutDot(k)).join('');
-      return `${tutPattern(TUT_DEMO_TAP, W, 'green')}<div class="tut-opts" style="--topt:${od}px">${opts}</div>`;
+      return `${tutPattern(TUT_DEMO_TAP, W, tapAns)}<div class="tut-opts" style="--topt:${od}px">${opts}</div>`;
     },
-    cap: 'Depois do azul vem o verde. Então é só tocar no verde!'
+    cap: `Depois ${doA(tapPrev)} ${nm(tapPrev)} vem ${oA(tapAns)} ${nm(tapAns)}. Então é só tocar ${noA(tapAns)} ${nm(tapAns)}!`
   });
 
   pages.push({
     title: 'Leia como um livro',
-    say: 'As bolinhas podem ficar em várias linhas. Leia como num livro: da esquerda para a direita, uma linha de cada vez. O “?” que brilha é o da vez!',
+    say: `${M('As bolinhas', 'Os bichinhos')} podem ficar em várias linhas. Leia como num livro: da esquerda para a direita, uma linha de cada vez. O “?” que brilha é o da vez!`,
     stage: W => {
       const d = TUT_DEMO_BOOK, per = 5, gap = 6;
       const size = Math.max(22, Math.min(tutMaxDot(), Math.floor((W - 82) / per)));
@@ -2646,7 +2891,7 @@ function tutPages() {
       const cell = (k, i) => {
         if (i >= d.from && i < d.from + d.count) {
           n++;
-          return `<div class="tut-hole"><div class="dot blank${n === 1 ? ' active' : ''}"></div></div>`;     // sem número: aqui os números são só das linhas
+          return `<div class="tut-hole"><div class="dot blank${n === 1 ? ' active' : ''}"></div></div>`;
         }
         return tutDot(k);
       };
@@ -2655,14 +2900,14 @@ function tutPages() {
       return `<div class="tut-book" style="--tdot:${size}px;--tgap:${gap}px">${row(0, per, 1, '→')}${row(per, d.total, 2, '🏁')}</div>`;
     },
     cap: 'Toque no “?” que brilha. Depois o brilho vai para o próximo!',
-    tip: '🧽 Tocou na cor errada? Aperte o botão Limpar, que aparece embaixo, e recomece.'
+    tip: `🧽 Tocou ${M('na cor errada', 'no bichinho errado')}? Aperte o botão Limpar, que aparece embaixo, e recomece.`
   });
 
   const worldSay = [
-    lv => `Aqui é fácil! Só ${lv.colors} cores se revezando e ${qm(lv.blanks)} no final. Olhe a última cor e pense: qual vem depois?`,
-    lv => `Agora são ${lv.colors} cores na fila e ${qm(lv.blanks)} no final. Toque primeiro no da esquerda, depois no da direita!`,
-    lv => `Chegaram o rosa e o roxo! São ${lv.colors} cores e ${qm(lv.blanks)}. E o “?” pode aparecer em qualquer lugar: no começo, no meio ou no fim.`,
-    lv => `O mais difícil! ${lv.colors} cores e ${qm(lv.blanks)}, em qualquer lugar. Calma: ache o grupo que se repete e confira uma bolinha de cada vez.`
+    lv => `Aqui é fácil! Só ${coisas(lv.colors)} se revezando e ${qm(lv.blanks)} no final. Olhe ${M('a última cor', 'o último bichinho')} e pense: qual vem depois?`,
+    lv => `Agora são ${coisas(lv.colors)} na fila e ${qm(lv.blanks)} no final. Toque primeiro no da esquerda, depois no da direita!`,
+    lv => `Chegaram ${oA(novos[0])} ${nm(novos[0])} e ${oA(novos[1])} ${nm(novos[1])}! São ${coisas(lv.colors)} e ${qm(lv.blanks)}. E o “?” pode aparecer em qualquer lugar: no começo, no meio ou no fim.`,
+    lv => `O mais difícil! ${coisas(lv.colors)} e ${qm(lv.blanks)}, em qualquer lugar. Calma: ache o grupo que se repete e confira ${M('uma bolinha', 'um bichinho')} de cada vez.`
   ];
   const worldTip = [
     '',
@@ -2679,10 +2924,10 @@ function tutPages() {
       say: worldSay[i](lv),
       stage: W => `${tutLine('O que se repete:', d.cycle)}${tutPattern(d, W)}${tutLine(d.count > 1 ? 'Resposta, nesta ordem:' : 'Resposta:', answers)}`,
       facts: [
-        ['🎨', `${lv.colors} cores`],
+        [M('🎨', '🐾'), coisas(lv.colors)],
         ['❓', `${lv.blanks} ${lv.blanks === 1 ? 'espaço' : 'espaços'}`],
         ['📍', lv.anywhere ? 'em qualquer lugar' : 'só no final'],
-        ['👆', `${lv.options} cores para tocar`]
+        ['👆', `${coisas(lv.options)} para tocar`]
       ],
       tip: worldTip[i]
     });
@@ -2692,7 +2937,7 @@ function tutPages() {
     title: 'Relógio e estrelas',
     say: 'O relógio ⏱️ vai contando o tempo, mas calma: o importante é acertar! No final você vê o tempo de cada padrão e ganha até 4 estrelas ⭐.',
     stage: () => {
-      const step = TOTAL_ROUNDS / FINAL_STARS;      // 5 acertos para cada estrela
+      const step = TOTAL_ROUNDS / FINAL_STARS;
       const rows = Array.from({ length: FINAL_STARS }, (_, t) => {
         const n = t + 1;
         return `<div class="tut-star-row"><span>${t * step + 1} a ${(t + 1) * step} acertos</span>` +
@@ -2717,7 +2962,7 @@ function renderTutorialPage(dir) {
   const pg = pages[tutorialIndex], last = tutorialIndex === pages.length - 1;
 
   const bs = getComputedStyle(body);
-  const W = Math.max(150, Math.floor(body.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight) - 20));   // 20 = respiro do "quadro" do exemplo
+  const W = Math.max(150, Math.floor(body.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight) - 20));
   tutorialWidth = body.clientWidth;
 
   const color = pg.world === undefined ? 'var(--chalk)' : WORLDS[pg.world].color;
@@ -2743,7 +2988,7 @@ function renderTutorialPage(dir) {
     (pg.cap ? `<p class="tut-cap">${pg.cap}</p>` : '') + facts + (pg.tip ? `<p class="tut-tip">${pg.tip}</p>` : '') +
     `</div>`;
   body.scrollTop = 0;
-  body.querySelectorAll('.dot:not(.blank)').forEach(paintSwatch);   // cores à prova do "modo escuro forçado", como no jogo
+  body.querySelectorAll('.dot:not(.blank)').forEach(paintSwatch);
 
   document.getElementById('tut-segs').innerHTML = pages.map((p, i) =>
     `<button type="button" class="tut-seg${i < tutorialIndex ? ' done' : ''}${i === tutorialIndex ? ' current' : ''}" data-go="${i}" tabindex="-1" aria-label="Ir para o passo ${i + 1}"${i === tutorialIndex ? ' aria-current="step"' : ''}><i></i></button>`).join('');
@@ -2752,7 +2997,6 @@ function renderTutorialPage(dir) {
   updateTutorialMore();
 }
 
-// Se a página for maior que a janela (celular pequeno ou deitado), mostra a setinha ▼ "tem mais embaixo".
 function updateTutorialMore() {
   const body = document.getElementById('tut-body'), more = document.getElementById('tut-more'), wrap = document.getElementById('tut-bodywrap');
   if (!body || !more) return;
@@ -2761,15 +3005,13 @@ function updateTutorialMore() {
   if (wrap) wrap.classList.toggle('has-more', hasMore);
 }
 
-// Todas as páginas usam a MESMA altura (a da mais alta), para os botões "Voltar" e "Próximo" ficarem sempre no mesmo lugar.
-// (Em telas baixas a janela para na altura da tela e a página rola por dentro.)
 function equalizeTutorialHeight() {
   const sheet = document.getElementById('tut-sheet');
   if (!sheet) return;
   const keep = tutorialIndex, total = tutPages().length;
   sheet.style.height = '';
   let tallest = 0;
-  for (let i = 0; i < total; i++) {            // desenha cada página (sem pintar na tela) só para medir
+  for (let i = 0; i < total; i++) {
     tutorialIndex = i;
     renderTutorialPage(0);
     tallest = Math.max(tallest, sheet.offsetHeight);
@@ -2794,7 +3036,7 @@ function onTutorialKey(e) {
   if (e.key === 'Escape') { e.preventDefault(); closeTutorial(); return; }
   if (e.key === 'ArrowRight') { e.preventDefault(); tutorialGo(1); return; }
   if (e.key === 'ArrowLeft') { e.preventDefault(); tutorialGo(-1); return; }
-  if (e.key === 'Tab') {     // o foco fica preso dentro da janela
+  if (e.key === 'Tab') {
     const f = [...m.querySelectorAll('button:not([disabled]):not([tabindex="-1"])')];
     if (!f.length) return;
     const first = f[0], lastBtn = f[f.length - 1], inside = m.contains(document.activeElement);
@@ -2845,11 +3087,10 @@ function openTutorial() {
   document.body.appendChild(m);
   document.documentElement.classList.add('modal-open');
 
-  m.addEventListener('click', e => { if (e.target === m) closeTutorial(); });      // clicar fora fecha
+  m.addEventListener('click', e => { if (e.target === m) closeTutorial(); });
   m.querySelector('#tut-close').addEventListener('click', closeTutorial);
   m.querySelector('#tut-prev').addEventListener('click', () => tutorialGo(-1));
   m.querySelector('#tut-next').addEventListener('click', () => {
-    // "Bora jogar! 🎉" (botão da última página), aberto na tela inicial: fecha o tutorial e já começa o jogo
     const startNow = tutorialIndex === tutPages().length - 1 && document.documentElement.getAttribute('data-screen') === 'start';
     tutorialGo(1);
     if (startNow) startGame();
@@ -2863,12 +3104,11 @@ function openTutorial() {
     tutorialIndex = to;
     renderTutorialPage(dir);
   });
-  // deslizar o dedo para o lado também troca de página (só se o movimento for mais de lado que de cima para baixo)
   const body = m.querySelector('#tut-body');
   body.addEventListener('scroll', updateTutorialMore, { passive: true });
   const scrollTutorialDown = () => body.scrollBy({ top: Math.round(body.clientHeight * 0.75), behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
-  m.querySelector('#tut-more').addEventListener('click', scrollTutorialDown);          // pelo teclado
-  body.addEventListener('click', e => {                                                // toque em cima da setinha (ela deixa o toque passar)
+  m.querySelector('#tut-more').addEventListener('click', scrollTutorialDown);
+  body.addEventListener('click', e => {
     const more = document.getElementById('tut-more');
     if (!more || more.hidden) return;
     const r = more.getBoundingClientRect(), pad = 8;
@@ -2887,8 +3127,6 @@ function openTutorial() {
   m.querySelector('#tut-next').focus({ preventScroll: true });
 }
 
-// Se a tela mudar de largura com o tutorial aberto (girar o celular), desenha a página de novo.
-// Mudar só a altura (barras do navegador aparecendo e sumindo) não mexe em nada, para não voltar a rolagem ao topo.
 function relayoutTutorial() {
   const body = document.getElementById('tut-body');
   if (body && body.clientWidth !== tutorialWidth) equalizeTutorialHeight();
@@ -2896,6 +3134,48 @@ function relayoutTutorial() {
 }
 
 document.getElementById('help-btn').addEventListener('click', openTutorial);
+
+/* ---------------- Botão "Modo daltônico" ----------------
+   Troca as cores por bichinhos (e volta). A escolha fica salva neste aparelho.
+   Dá para trocar a qualquer hora, até no meio de um padrão: nada do jogo se perde. */
+
+function applyModeButton() {
+  document.documentElement.classList.toggle('animal-mode', animalMode);
+  const btn = document.getElementById('mode-btn');
+  if (!btn) return;
+  btn.setAttribute('aria-checked', animalMode ? 'true' : 'false');
+  btn.title = animalMode
+    ? 'Modo daltônico ligado: toque para voltar às cores'
+    : 'Modo daltônico: toque para trocar as cores por bichinhos';
+}
+
+function refreshModeContent() {
+  if (document.documentElement.getAttribute('data-screen') === 'start') { showStartScreen(); return; }
+  document.querySelectorAll('.dot, .option').forEach(el => { if (colorKeyOf(el)) paintSwatch(el); });
+  document.querySelectorAll('.option').forEach(btn => {
+    const k = colorKeyOf(btn);
+    if (!k) return;
+    btn.setAttribute('aria-label', itemName(k));
+    btn.title = itemName(k);
+  });
+  const label = document.getElementById('options-label');
+  if (label) label.textContent = optionsLabelText();
+  if (shownPrompt >= 0) showPrompt(shownPrompt);
+  scheduleFit();
+}
+
+function toggleAnimalMode() {
+  animalMode = !animalMode;
+  try { localStorage.setItem(MODE_KEY, animalMode ? 'bichos' : 'cores'); } catch (e) {}
+  applyModeButton();
+  refreshModeContent();
+  showToast(animalMode
+    ? '🐾 Modo daltônico ligado: as cores viraram bichinhos!'
+    : '🎨 Modo daltônico desligado: as cores voltaram!');
+}
+
+document.getElementById('mode-btn').addEventListener('click', toggleAnimalMode);
+applyModeButton();
 
 /* ---------------- Início ---------------- */
 
@@ -2925,15 +3205,15 @@ function showStartScreen() {
     <div class="start-screen">
       <div class="mascot-row">
         <div class="mascot">${MASCOT}</div>
-        <div class="bubble">Oi! Eu sou a Luna. Vamos brincar com as cores? 🎨</div>
+        <div class="bubble">${M('Oi! Eu sou a Luna. Vamos brincar com as cores? 🎨', 'Oi! Eu sou a Luna. Vamos brincar com os bichinhos? 🐾')}</div>
       </div>
       <div class="start-dots">
         ${previewColors.map(c => `<div class="dot ${c}"></div>`).join('')}
       </div>
       <h2>Treine seu olho para padrões</h2>
       <p class="start-text">
-        <span class="st-line">👀 Olhe as bolinhas: as cores se repetem, formando um padrão.</span>
-        <span class="st-line">🔍 Algumas estão escondidas atrás de um “?”. Descubra quais cores faltam e toque nelas, da esquerda para a direita.</span>
+        <span class="st-line">${M('👀 Olhe as bolinhas: as cores se repetem, formando um padrão.', '👀 Olhe os bichinhos: eles se repetem, formando um padrão.')}</span>
+        <span class="st-line">${M('🔍 Algumas estão escondidas atrás de um “?”. Descubra quais cores faltam e toque nelas, da esquerda para a direita.', '🔍 Alguns estão escondidos atrás de um “?”. Descubra quais bichinhos faltam e toque neles, da esquerda para a direita.')}</span>
         <span class="st-line">🌎 São 20 padrões em 4 mundos. A cada mundo, fica mais difícil!</span>
       </p>
       <button class="play-btn" id="play-btn">▶ PLAY</button>
