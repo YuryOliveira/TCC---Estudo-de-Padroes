@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#24443B">
+<!-- O jogo já é escuro. Estas linhas avisam os navegadores (Chrome e outros) e a extensão Dark Reader para NÃO aplicar o
+     "modo escuro forçado" por cima. Alguns navegadores (Samsung Internet) ignoram o aviso: por isso as bolinhas
+     coloridas são pintadas em <canvas> (veja paintSwatch no JS), que o modo escuro forçado não altera. -->
+<meta name="color-scheme" content="dark">
+<meta name="darkreader-lock">
 <title>Padrões de Cores</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
+    color-scheme: dark;   /* o jogo já é escuro: o navegador não deve "escurecer" as cores por conta própria */
     --bg: #24443B;
     --bg-deep: #17302A;
     --ink: #FFFFFF;
@@ -39,7 +45,10 @@
 
     --dot: 64px;
     --opt: 70px;
+
+    --vvh: 100%;   /* altura da área visível; o JS troca por px quando as barras do navegador somem ou aparecem */
   }
+  @supports (height: 100dvh) { :root { --vvh: 100dvh; } }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   button { touch-action: manipulation; font-family: inherit; }
@@ -78,7 +87,8 @@
   body::before {
     content: "";
     position: fixed;
-    inset: 0;
+    top: 0; left: 0; right: 0;
+    height: var(--vvh);
     z-index: 40;
     pointer-events: none;
     border-radius: 10px;
@@ -89,7 +99,7 @@
       inset 0 0 70px rgba(0, 0, 0, 0.4);
   }
 
-  .board-decor { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .board-decor { position: fixed; top: 0; left: 0; right: 0; height: var(--vvh); pointer-events: none; z-index: 0; }
   .decor { position: absolute; display: none; }
   .decor.rainbow  { top: 44px; left: 44px; width: 200px; }
   .decor.sun      { top: 36px; right: 44px; width: 150px; }
@@ -145,6 +155,11 @@
     gap: 10px;
     flex-wrap: wrap;
   }
+
+  /* Na tela inicial e na final não há contadores: o cabeçalho fica só com o título, centralizado */
+  .header-right:empty { display: none; }
+  html[data-screen="start"] header, html[data-screen="final"] header { justify-content: center; }
+  html[data-screen="start"] h1, html[data-screen="final"] h1 { text-align: center; }
 
   .pill {
     font-weight: 800;
@@ -377,6 +392,20 @@
   .c-purple { background: var(--purple); }
   .c-black { border-color: #D2C8EC; }
 
+  /* O miolo colorido é repintado num <canvas> por cima (função paintSwatch, no JS). Assim o "modo escuro forçado"
+     de alguns navegadores não consegue escurecer a cor da bolinha. O canvas é só uma amostra de cor esticada. */
+  .dot, .option { position: relative; overflow: hidden; }
+  .swatch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 50%;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+
   /* ---------- Controles ---------- */
   .controls {
     display: flex;
@@ -561,7 +590,7 @@
 
   .times-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     text-align: left;
   }
@@ -570,12 +599,14 @@
     justify-content: space-between;
     gap: 8px;
     font-size: 0.85rem;
-    background: var(--card-alt);
-    border: 2px solid var(--border);
+    /* --w = cor do mundo (nível de dificuldade) do padrão; --wbg = tom escuro dessa cor, para o fundo (vêm do JS, WORLDS) */
+    background: var(--wbg, var(--card-alt));
+    border: 2px solid var(--w, var(--border));
     border-radius: 12px;
     padding: 6px 10px;
   }
-  .time-item-label { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .time-item { min-width: 0; }
+  .time-item-label { color: var(--w, var(--muted)); font-weight: 700; white-space: nowrap; }
   .time-item-value { color: var(--sun); font-weight: 800; font-variant-numeric: tabular-nums; }
 
   /* ---------- Tela inicial ---------- */
@@ -698,6 +729,8 @@
 
     header { margin-bottom: 6px; gap: 8px; flex-wrap: nowrap; }
     h1 { font-size: 1.3rem; }
+    html[data-screen="start"] h1 { font-size: 1.75rem; }
+    html[data-screen="start"] header { margin-bottom: 12px; }
     html[data-screen="play"] h1 { display: none; }
     .header-right { gap: 6px; flex-wrap: nowrap; width: 100%; justify-content: space-between; }
     .pill { font-size: 0.85rem; padding: 3px 9px; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.22); }
@@ -731,7 +764,7 @@
     .chip .chip-num { font-size: 1.1rem; }
     .restart-btn { padding: 11px 22px; font-size: 1rem; }
     .times-section { margin-top: 18px; padding-top: 14px; }
-    .times-list { grid-template-columns: repeat(2, 1fr); }
+    .times-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
     .start-screen { padding: 2px; }
     .start-screen .mascot { font-size: 2.8rem; }
@@ -758,6 +791,12 @@
   @media (max-height: 460px) {
     .start-dots { display: none; }
     .final .mascot-row { display: none; }
+  }
+
+  /* Telas de celular: na lista de tempos da tela final cabe só o número do padrão (ex.: "✅ 14  00:03.120") */
+  @media (max-width: 560px) {
+    .time-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .time-item { font-size: 0.8rem; gap: 4px; padding: 5px 8px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -804,11 +843,12 @@ const TOTAL_ROUNDS = 20;
 const ROUNDS_PER_WORLD = 5;
 
 // Um "mundo" a cada 5 padrões: é aqui que a dificuldade sobe.
+// color = cor do mundo (barra de progresso, borda e número na tabela de tempos); tint = tom escuro da mesma cor, usado de fundo na tabela.
 const WORLDS = [
-  { emoji: '🌱', name: 'Mundo Verde',    color: '#5BE37D' },
-  { emoji: '🚀', name: 'Mundo Aventura', color: '#4DC3FF' },
-  { emoji: '🔮', name: 'Mundo Mágico',   color: '#FF7EC8' },
-  { emoji: '👑', name: 'Mundo Campeão',  color: '#FFD166' }
+  { emoji: '🌱', name: 'Mundo Verde',    color: '#5BE37D', tint: '#1F5B2E' },
+  { emoji: '🚀', name: 'Mundo Aventura', color: '#4DC3FF', tint: '#1F475B' },
+  { emoji: '🔮', name: 'Mundo Mágico',   color: '#FF7EC8', tint: '#5B1F42' },
+  { emoji: '👑', name: 'Mundo Campeão',  color: '#FFD166', tint: '#5B491F' }
 ];
 
 const PROMPTS = [
@@ -959,14 +999,29 @@ function scheduleFit() {
   fitFrame = requestAnimationFrame(() => { fitFrame = null; fitToViewport(); });
 }
 
+// A moldura de madeira e os enfeites da lousa precisam cobrir EXATAMENTE a área visível. Em alguns celulares
+// as barras do navegador somem ao rolar a página e a moldura ficava mais curta que a tela.
+let lastFrameH = 0;
+function syncFrameHeight() {
+  const vv = window.visualViewport;
+  if (vv && vv.scale > 1.01) return;                  // com zoom de pinça, deixa como está
+  const h = viewportHeight();
+  if (!h || h === lastFrameH) return;
+  lastFrameH = h;
+  document.documentElement.style.setProperty('--vvh', h + 'px');
+}
+
 function onViewportChange() {
+  syncFrameHeight();
   if (document.documentElement.getAttribute('data-screen') === 'play') layoutPlay();
   else scheduleFit();
 }
 window.addEventListener('resize', onViewportChange);
 window.addEventListener('orientationchange', () => setTimeout(onViewportChange, 150));
 if (window.visualViewport) window.visualViewport.addEventListener('resize', onViewportChange);
+window.addEventListener('scroll', syncFrameHeight, { passive: true });   // as barras do navegador mudam enquanto rola
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(onViewportChange);
+syncFrameHeight();
 
 /* ---------------- Cronômetro (contínuo) ---------------- */
 
@@ -1244,6 +1299,30 @@ function launchFinalAnimation(s) {
 
 /* ---------------- Rodada ---------------- */
 
+// Pinta o miolo colorido de uma bolinha dentro de um <canvas> (a cor vem do CSS: --red, --blue...).
+// Por quê: o "modo escuro forçado" de alguns navegadores (Samsung Internet, por exemplo) escurece as cores de
+// fundo do CSS e deixa o amarelo marrom, o verde escuro... Mas ele não mexe no conteúdo de um <canvas>.
+// Se o canvas não existir ou falhar, a bolinha continua com a cor do CSS por baixo.
+function paintSwatch(el) {
+  let cv = el.querySelector('canvas.swatch');
+  if (!cv) {
+    cv = document.createElement('canvas');
+    cv.className = 'swatch';
+    cv.width = cv.height = 2;
+    cv.setAttribute('aria-hidden', 'true');
+    el.appendChild(cv);
+  }
+  const ctx = cv.getContext && cv.getContext('2d');
+  if (!ctx) return;
+  ctx.fillStyle = getComputedStyle(el).backgroundColor;
+  ctx.fillRect(0, 0, 2, 2);
+}
+
+function clearSwatch(el) {
+  const cv = el.querySelector('canvas.swatch');
+  if (cv) cv.remove();
+}
+
 function renderRound() {
   clearEffects();   // o confete do acerto anterior não pode cobrir o próximo padrão (o tempo está correndo)
   setScreen('play');
@@ -1278,6 +1357,7 @@ function renderRound() {
     const dot = document.createElement('div');
     dot.className = `dot ${COLORS[color].class}`;
     patternRow.appendChild(dot);
+    paintSwatch(dot);
   });
 
   for (let i = 0; i < round.numBlanks; i++) {
@@ -1292,6 +1372,7 @@ function renderRound() {
     const dot = document.createElement('div');
     dot.className = `dot ${COLORS[color].class}`;
     patternRow.appendChild(dot);
+    paintSwatch(dot);
   });
 
   const optionsRow = document.getElementById('options-row');
@@ -1302,6 +1383,7 @@ function renderRound() {
     btn.title = COLORS[color].name;
     btn.addEventListener('click', () => handlePick(color));
     optionsRow.appendChild(btn);
+    paintSwatch(btn);
   });
 
   document.getElementById('next-btn').addEventListener('click', goNext);
@@ -1327,6 +1409,7 @@ function handlePick(color) {
   const blankEl = document.getElementById(`blank-${activeBlankIndex}`);
   blankEl.classList.remove('active');
   blankEl.classList.add(COLORS[color].class, 'filled', 'pop');
+  paintSwatch(blankEl);
 
   document.getElementById('clear-btn').classList.remove('hidden');
 
@@ -1348,6 +1431,7 @@ function clearRound() {
   for (let i = 0; i < round.numBlanks; i++) {
     const blankEl = document.getElementById(`blank-${i}`);
     blankEl.className = 'dot blank';
+    clearSwatch(blankEl);
     if (i === 0) blankEl.classList.add('active');
   }
 
@@ -1401,6 +1485,7 @@ function evaluateRound() {
       const dot = document.createElement('div');
       dot.className = `dot mini ${COLORS[color].class}`;
       answerRow.appendChild(dot);
+      paintSwatch(dot);
     });
   }
 
@@ -1471,7 +1556,7 @@ function renderFinal() {
   const avgTime = totalTime / TOTAL_ROUNDS;
 
   const timesListHtml = roundTimes.map((t, i) =>
-    `<div class="time-item"><span class="time-item-label">${roundResults[i] ? '✅' : '❌'} Padrão ${i + 1}</span><span class="time-item-value">${formatTime(t || 0)}</span></div>`
+    `<div class="time-item" style="--w:${WORLDS[worldIndexOf(i)].color};--wbg:${WORLDS[worldIndexOf(i)].tint}"><span class="time-item-label">${roundResults[i] ? '✅' : '❌'} <span class="time-word">Padrão </span>${i + 1}</span><span class="time-item-value">${formatTime(t || 0)}</span></div>`
   ).join('');
 
   area.innerHTML = `
@@ -1804,12 +1889,13 @@ function shTimes(ctx, avgTime) {
   const x0 = (SHARE_W - total) / 2, y0 = 992;
   for (let i = 0; i < TOTAL_ROUNDS; i++) {
     const x = x0 + (i % cols) * (cw + gap), y = y0 + Math.floor(i / cols) * (ch + rowGap);
-    ctx.fillStyle = '#2B5448'; shRound(ctx, x, y, cw, ch, 16); ctx.fill();
-    ctx.lineWidth = 3; ctx.strokeStyle = '#6E9A8A'; shRound(ctx, x, y, cw, ch, 16); ctx.stroke();
+    const mundo = WORLDS[worldIndexOf(i)], cor = mundo.color;   // cor do mundo (nível de dificuldade) deste padrão
+    ctx.fillStyle = mundo.tint; shRound(ctx, x, y, cw, ch, 16); ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = cor; shRound(ctx, x, y, cw, ch, 16); ctx.stroke();
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'left'; ctx.font = shFont(600, 22); ctx.fillStyle = '#F1EBD6';
     ctx.fillText(roundResults[i] ? '✅' : '❌', x + 11, y + ch / 2 + 2);
-    ctx.font = shFont(700, 24); ctx.fillStyle = '#CFE3DA';
+    ctx.font = shFont(800, 24); ctx.fillStyle = cor;
     ctx.fillText(String(i + 1), x + 42, y + ch / 2 + 2);
     ctx.textAlign = 'right'; ctx.font = shFont(800, 22); ctx.fillStyle = '#FFD166';
     ctx.fillText(formatTime(roundTimes[i] || 0), x + cw - 12, y + ch / 2 + 2);
@@ -2053,6 +2139,7 @@ function showStartScreen() {
       <button class="play-btn" id="play-btn">▶ PLAY</button>
     </div>
   `;
+  area.querySelectorAll('.start-dots .dot').forEach(paintSwatch);
   document.getElementById('play-btn').addEventListener('click', startGame);
   scheduleFit();
 }
