@@ -1021,7 +1021,7 @@
     animation: fall linear forwards;
   }
 
-  /* ---------- Animações da tela final (uma por faixa de 5 acertos) ---------- */
+  /* ---------- Animações da tela final (uma por faixa de 3 acertos) ---------- */
   .fx { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 60; }
   .fx .p { position: absolute; line-height: 1; will-change: transform, opacity; }
 
@@ -1355,8 +1355,8 @@ const doA = k => (fem(k) ? 'da' : 'do');   // do azul · da baleia
 const noA = k => (fem(k) ? 'na' : 'no');   // no verde · na tartaruga
 const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
 
-const TOTAL_ROUNDS = 20;
-const ROUNDS_PER_WORLD = 5;
+const TOTAL_ROUNDS = 12;
+const ROUNDS_PER_WORLD = 3;
 
 const WORLDS = [
   { emoji: '🌱', name: 'Mundo Verde',    color: '#5BE37D', tint: '#1F5B2E' },
@@ -1830,7 +1830,7 @@ function launchFinalAnimation(s) {
   };
 
   if (tier === 0) {
-    // 0–5: corações e brotinhos subindo devagar (carinho e incentivo)
+    // 0–3: corações e brotinhos subindo devagar (carinho e incentivo)
     const icons = ['💙', '🌱', '💪', '💙'];
     for (let i = 0; i < 18; i++) {
       add(pickRandom(icons),
@@ -1839,7 +1839,7 @@ function launchFinalAnimation(s) {
         `animation:floatUp ${rnd(4.5, 7)}s ease-in-out ${rnd(0, 2.5)}s both;`);
     }
   } else if (tier === 1) {
-    // 6–10: chuva de estrelinhas brilhantes
+    // 4–6: chuva de estrelinhas brilhantes
     const icons = ['⭐', '✨', '🌟'];
     for (let i = 0; i < 24; i++) {
       add(pickRandom(icons),
@@ -1848,7 +1848,7 @@ function launchFinalAnimation(s) {
         `animation:starFall ${rnd(3.5, 6)}s ease-in-out ${rnd(0, 2.5)}s both;`);
     }
   } else if (tier === 2) {
-    // 11–15: balões coloridos subindo + confete
+    // 7–9: balões coloridos subindo + confete
     for (let i = 0; i < 12; i++) {
       add('🎈',
         `left:${rnd(4, 94)}%;bottom:-90px;font-size:${rnd(2.4, 3.6)}rem;` +
@@ -1857,7 +1857,7 @@ function launchFinalAnimation(s) {
     }
     launchConfetti(30);
   } else {
-    // 16–20: fogos de artifício, troféu e muito confete
+    // 10–12: fogos de artifício, troféu e muito confete
     for (let b = 0; b < 6; b++) {
       const cx = rnd(12, 88), cy = rnd(10, 50);
       const delay = b * 0.55 + rnd(0, 0.2);
@@ -2559,20 +2559,20 @@ function shTimes(ctx, avgTime) {
   ctx.font = shFont(800, 36); ctx.fillStyle = '#FFD166';
   ctx.fillText(`Média por padrão: ${formatTime(avgTime)}`, SHARE_W / 2, 960);
 
-  const cols = 4, gap = 14, total = 912, cw = (total - gap * (cols - 1)) / cols, ch = 64, rowGap = 12;
+  const cols = ROUNDS_PER_WORLD, gap = 14, total = 912, cw = (total - gap * (cols - 1)) / cols, ch = 80, rowGap = 14;
   const x0 = (SHARE_W - total) / 2, y0 = 992;
   for (let i = 0; i < TOTAL_ROUNDS; i++) {
     const x = x0 + (i % cols) * (cw + gap), y = y0 + Math.floor(i / cols) * (ch + rowGap);
     const mundo = WORLDS[worldIndexOf(i)], cor = mundo.color;
-    ctx.fillStyle = mundo.tint; shRound(ctx, x, y, cw, ch, 16); ctx.fill();
-    ctx.lineWidth = 3; ctx.strokeStyle = cor; shRound(ctx, x, y, cw, ch, 16); ctx.stroke();
+    ctx.fillStyle = mundo.tint; shRound(ctx, x, y, cw, ch, 20); ctx.fill();
+    ctx.lineWidth = 4; ctx.strokeStyle = cor; shRound(ctx, x, y, cw, ch, 20); ctx.stroke();
     ctx.textBaseline = 'middle';
-    ctx.textAlign = 'left'; ctx.font = shFont(600, 22); ctx.fillStyle = '#F1EBD6';
-    ctx.fillText(roundResults[i] ? '✅' : '❌', x + 11, y + ch / 2 + 2);
-    ctx.font = shFont(800, 24); ctx.fillStyle = cor;
-    ctx.fillText(String(i + 1), x + 42, y + ch / 2 + 2);
-    ctx.textAlign = 'right'; ctx.font = shFont(800, 22); ctx.fillStyle = '#FFD166';
-    ctx.fillText(formatTime(roundTimes[i] || 0), x + cw - 12, y + ch / 2 + 2);
+    ctx.textAlign = 'left'; ctx.font = shFont(600, 28); ctx.fillStyle = '#F1EBD6';
+    ctx.fillText(roundResults[i] ? '✅' : '❌', x + 18, y + ch / 2 + 2);
+    ctx.font = shFont(800, 32); ctx.fillStyle = cor;
+    ctx.fillText(String(i + 1), x + 62, y + ch / 2 + 2);
+    ctx.textAlign = 'right'; ctx.font = shFont(800, 30); ctx.fillStyle = '#FFD166';
+    ctx.fillText(formatTime(roundTimes[i] || 0), x + cw - 18, y + ch / 2 + 2);
   }
   ctx.textBaseline = 'alphabetic';
 }
@@ -3214,7 +3214,7 @@ function showStartScreen() {
       <p class="start-text">
         <span class="st-line">${M('👀 Olhe as bolinhas: as cores se repetem, formando um padrão.', '👀 Olhe os bichinhos: eles se repetem, formando um padrão.')}</span>
         <span class="st-line">${M('🔍 Algumas estão escondidas atrás de um “?”. Descubra quais cores faltam e toque nelas, da esquerda para a direita.', '🔍 Alguns estão escondidos atrás de um “?”. Descubra quais bichinhos faltam e toque neles, da esquerda para a direita.')}</span>
-        <span class="st-line">🌎 São 20 padrões em 4 mundos. A cada mundo, fica mais difícil!</span>
+        <span class="st-line">🌎 São ${TOTAL_ROUNDS} padrões em ${WORLDS.length} mundos. A cada mundo, fica mais difícil!</span>
       </p>
       <button class="play-btn" id="play-btn">▶ PLAY</button>
       <p class="start-hint">Ficou na dúvida? Toque em <b>📖 Como jogar</b>, lá embaixo, à direita.</p>
